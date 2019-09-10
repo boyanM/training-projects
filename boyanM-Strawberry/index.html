@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Strawberry</title>
+
+	<script src="libraries/p5.js"></script>
+	<script src="libraries/p5.dom.js"></script>
+	<script src="libraries/p5.sound.js"></script>
+	<script src="sketch.js"></script>
+
+	<style>
+		body {
+			margin:0;
+			padding:0;
+		}
+		canvas {
+			margin:auto;
+		}
+	</style>
+</head>
+<body>
+
+	<div class = "input">
+    <p>Enter: (rows,columns,days, coordinate1,coordinate2) </p>
+      Rows: <input type="number" id="rows">
+      Columns: <input type="number" id="cols">
+      Days: <input type="number" id="days">
+      Coordinate 1: <input type="text" id="coord1">
+      Coordinate 2: <input type="text" id="coord2">
+      <button onclick = "caller()" style="margin-top: 5px;">Submit</button>
+    </div> 
+    <div id="graphic">
+    </div>
+    <div id = "output">
+    	<p>Output:</p>
+    </div>
+
+</body>
+</html>
