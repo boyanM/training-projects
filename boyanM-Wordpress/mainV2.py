@@ -8,7 +8,7 @@ import json
 import psycopg2
 import time
 
-def request(count,bbox):
+def request(count,bbox,APInumbers):
 	#Example: ?bbox=22,41,34,43,1000&appid=4d90eceaefb65097f2a3d9f86539e3f5
 	url = 'https://api.openweathermap.org/data/2.5/box/city'
 	payload = {'bbox':bbox,'appid':'4d90eceaefb65097f2a3d9f86539e3f5'}
@@ -17,17 +17,20 @@ def request(count,bbox):
 	if len(r_dict) == 0:
 		return (count,'')
 	else:
-		string=''
+		string = ''
 		listOfAllCities = r_dict['list']
 		coordinates_dict = listOfAllCities[0]['coord']
+		print(listOfAllCities[0]['name'])
 		for element in range(len(listOfAllCities)):
-			coordinates_dict = listOfAllCities[element]['coord']
-			coordinates = ''
-			coordinates = ","+str(coordinates_dict['Lat']) + "," + str(coordinates_dict['Lon']) + '\n'
-			string += str(count) + ","+str(listOfAllCities[element]['id'])
-			string +=","+ "'" + listOfAllCities[element]['name'] + "'"
-			string += coordinates
-			count += 1
+			if listOfAllCities[element]['id'] not in APInumbers:
+				coordinates_dict = listOfAllCities[element]['coord']
+				coordinates = ''
+				coordinates = ","+str(coordinates_dict['Lat']) + "," + str(coordinates_dict['Lon']) + '\n'
+				string += str(count) + ","+str(listOfAllCities[element]['id'])
+				string +=","+ "'" + listOfAllCities[element]['name'] + "'"
+				string += coordinates
+				count += 1
+				APInumbers.append(listOfAllCities[element]['id'])
 			
 		return (count,string)
 
@@ -52,37 +55,36 @@ def geoCalc(lngBot,latBot,lngTop,latTop):
 			
 count = 1
 markers = ""
-
+APInumbers = []
 area = []
 
 #South America
-SA = geoCalc(-71,-17,-50,13)
+SA = geoCalc(-99,49,-35,15)
 
 #Europe
 EU = geoCalc(-9,37,47,70)
 
-#Wyoming - U.S.
-WY = geoCalc(-111,40,-103,45)
+#U.S
+US = geoCalc(-117,32,-66,47)
 
-#From Arkansas to New York
-A_NY = geoCalc(-93,33,-70,43)
+#North America
+NA = geoCalc(-129,49,-59,61)
 
 #Asia
 AS = geoCalc(8,77,134,46)
 
 area.extend(SA)
 area.extend(EU)
-area.extend(WY)
-area.extend(A_NY)
+area.extend(US)
 area.extend(AS)
+area.extend(NA)
 
-print("Number of Cities: ",len(area))
 
 start = time.time()
 for i in range(len(area)):
 	bbox = str(area[i][0]) + "," + str(area[i][1]) + "," + str(area[i][2])
 	bbox += "," + str(area[i][3]) + ",1000" 
-	info = request(count,bbox)
+	info = request(count,bbox,APInumbers)
 	count = info[0]
 	markers += info[1]
 print(markers)
@@ -104,11 +106,11 @@ try:
 		cursor.execute("truncate markers")
 	lines = markers.splitlines()
 	for i in range(len(lines)):
-		insert = "insert into markers(id,number,country,lat,lng) values (" + lines[i] + ");"
+		insert = "insert into markers(id,numberAPI,country,lat,lng) values (" + lines[i] + ");"
 		cursor.execute(insert)
-		connection.commit()
+	connection.commit()
 except (Exception, psycopg2.Error) as error :
-	print ("Error while connecting to PostgreSQL", error)
+	print("Error while connecting to PostgreSQL", error)
 finally:
 	if(connection):
 		cursor.close()
