@@ -1,0 +1,31 @@
+====================================================================================================
+Registration&Login&Other_functionalities
+
+
+Content:
+----------------------------------------------------------------------------------------------------
+
+Registration form:
+
+1. E-mail
+2. Name, Family name
+3. Password, Confirm Password
+4. Agree with terms
+5. Tel.
+6. Address.
+7. Gender
+8. Recaptcha
+9. Username
+10. Data of birth
+11. Check for no empty fields
+
+
+----------------------------------------------------------------------------------------------------
+
+Login :
+1. Username or E-mail
+2. Password
+3. Forgot Password
+4. Forgot Username
+5. 
+
