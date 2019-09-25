@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <div id="wrapper">
@@ -24,8 +25,11 @@
   <label for="psw-repeat"><b>Repeat Password</b></label>
   <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
 
-  <label for="full-name"><b>Full name</b></label>
-  <input type="text" placeholder="Enter Full name" name="full-name" required>
+  <label for="first-name"><b>First name</b></label>
+  <input type="text" placeholder="Enter First name" name="name" required>
+
+  <label for="last-name"><b>Last name</b></label>
+  <input type="text" placeholder="Enter Last name" name="lname" required>
 
   <label for="gender"><b>Gender</b></label><br>
   <input type="radio" name="gender" value="male" required> Male
@@ -35,17 +39,19 @@
   <input type="date" placeholder="Enter Birthday date" name="bday" required>
 
   <label for="phone"><b>Phone</b></label>
-  <input type="text" placeholder="Enter Phone" name="phone" required>
+  <input type="number" placeholder="Enter Phone" name="phone" required>
 
   <label for="address"><b>Address</b></label>
   <input type="text" placeholder="Enter Address" name="address" required>
 
-  <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label>
-
-    <hr>
-    <button type="submit" class="registerbtn">Register</button>
-  </div>
+  <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>
   
+  <div class="g-recaptcha" data-sitekey="6LclYLoUAAAAAG0FnwojofEbXcmLeE7I3pxv1v51"></div>
+
+  <hr>
+  <button type="submit" class="registerbtn">Register</button>
+  </div>
+
   <div class="container signin">
     <p>Already have an account? <a href="#">Sign in</a>.</p>
   </div>
