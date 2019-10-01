@@ -5,8 +5,28 @@ import psycopg2
 import re
 import datetime
 from passlib.hash import pbkdf2_sha256
+import requests
+import json
+import random
+import smtplib, ssl
+import os
 
+def requests(g_response):
+	url = 'https://www.google.com/recaptcha/api/siteverify'
+	payload = {'secret' :'6LclYLoUAAAAAH9eix2giVphRCUAj0I9me0azjkz','response':g_response}
 
+	try:
+		r = requests.get(url,params=payload)
+		r_dict = r.json()
+		status = r_dict['success']
+		print(status)
+
+		if status == False:
+			return False
+		else:
+			return True
+	except:
+		print("Error")
 
 def uniqueAttribute(attr,value):
 	result = -1
@@ -38,7 +58,7 @@ def uniqueAttribute(attr,value):
 			if result != -1:
 				return result
 
-def newCustomer(email,user,psw,name,lname,bday,gender,phone,address):
+def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 	try:
 		connection = psycopg2.connect(dbname="wordpress",
 		user="wpuser",
@@ -49,7 +69,8 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address):
 		cursor = connection.cursor()
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
-		insert = "insert into customers values ('%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(email,user,psw,name,lname,bday,gender,phone,address)
+		insert = "insert into customers (email,username,password,name,lname,bday,gender,phone,address,conf_token)\
+		values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(email,user,psw,name,lname,bday,gender,phone,address,key)
 		cursor.execute(insert)
 		connection.commit()
 
@@ -81,6 +102,41 @@ def validateDate(date):
 	else:
 		return False 
 
+
+
+def generateKey():
+	hexals = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f']
+	
+	length = 32
+	key = ""
+	for i in range(length):
+		key += random.choice(hexals)
+	return key
+	
+
+def sendMail(email,key): 
+	port = 465
+	smtp_server = "smtp.yandex.com"
+	sender_email = "boyan.milanov@yandex.com"
+	receiver_email = email
+	password = "Parola42"
+	link = 'http://127.0.0.1:8000/cgi-bin/activation.py?email=%s&token=%s'%(email,key)
+	message = """\
+Subject: Activate your account,
+
+Click the link below to activate your account.
+%s
+Note:
+If you have not registered on this site do nothing!"""%(link)
+	
+	context = ssl.create_default_context()
+	with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+	    server.login(sender_email, password)
+	    server.sendmail(sender_email, receiver_email, message)
+
+
+
+
 form = cgi.FieldStorage()
 
 email = form.getvalue('email')
@@ -105,6 +161,11 @@ psw = form.getvalue('psw')
 
 conf_psw = form.getvalue('psw-repeat')
 
+g_response = form.getvalue('g-recaptcha-response')
+
+ip = cgi.escape(os.environ["REMOTE_ADDR"])
+
+
 check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 checkIndexMeanings=["Invalid e-mail","There is already a user with this email address"
 ,"The username already exists. Please use a different username",
@@ -113,7 +174,8 @@ checkIndexMeanings=["Invalid e-mail","There is already a user with this email ad
 "Invalid phone number","Address cannot be longer than 30 characters",
 "Last name cannot be longer than 30 characters","Password must be at least 8 characters long",
 "Password must contain at least 1 Capital Letter",
-"Password must contain at least 1 Small-Case Letter","Password must contain letters"]
+"Password must contain at least 1 Small-Case Letter","Password must contain letters",
+"Please fill in the the reCAPTCHA"]
 
 if match == None: 
 	check[0] = False
@@ -159,15 +221,19 @@ else:
 			if psw.isupper():
 				check[12] = False	
 
+if g_response == None:
+	check[14] = False
+
+else:	
+	if requests(g_response) is False:
+		check[14] = False
+
+
 
 if gender == 'male':
 	gender = 'm'
 else:
 	gender = 'f'	
-
-
-
-
 
 
 validation = True
@@ -176,22 +242,24 @@ for i in check:
 		validation = False
 
 if(validation):
-	print( """Content-type:text/html\r\n\r\n
-	<html>
+	print("""Content-type:text/html\r\n\r\n
+<html>
 	<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="../reg_form.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="../reg_form.css">
 	</head>
 	<body>
-	<div id="wrapper">
-	<div class="container">
-	<h1>Successful Registration</h1>
-	<p>One last step to activate your profile is to verify your email address</p>
-	</div>
-	</div>
+		<div id="wrapper">
+			<div class="container">
+				<h1>Successful Registration</h1>
+				<p>One last step to activate your profile is to verify your email address</p>
+			</div>
+		</div>
 	</body>
-	</html>""")
-	newCustomer(email,user,psw,name,lname,bday,gender,phone,address)
+</html>""")
+	key = generateKey()
+	newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key)
+	sendMail(email,key)
 else:
 	error = ""
 	for i in range(len(check)):
@@ -203,6 +271,7 @@ else:
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../style.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <div id="wrapper">
@@ -251,14 +320,16 @@ else:
   <label for="address"><b>Address</b></label>
   <input type="text" placeholder="Enter Address" name="address" value ="%s">
 
-  <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label>
+  <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>
+  
+  <div class="g-recaptcha" data-sitekey="6LclYLoUAAAAAG0FnwojofEbXcmLeE7I3pxv1v51"></div>
 
     <hr>
     <button type="submit" class="registerbtn">Register</button>
   </div>
   
   <div class="container signin">
-    <p>Already have an account? <a href="#">Sign in</a>.</p>
+    <p>Already have an account? <a href="../login.html">Login</a>.</p>
   </div>
 </form>
 </div>
