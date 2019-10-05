@@ -1,22 +1,50 @@
 <?php
 
+
 $db = pg_connect("host=127.0.0.1 port=5432 dbname=ekatte user=ekatte_user password=Parola42");
-$result = pg_query($db, "select s.ekatte_id as ekatte_id, s.name as name,t.township_id as township, a.area_id as area from settlements as s,townships as t,areas as a where s.name='$_POST[settlement]' and t.township_id=s.township_id and t.area_id = a.area_id;");
+
+$countRows = pg_query($db, "select (select count(*) from settlements) as rows_settlement,(select count(*) from townships) as rows_townhips,(select count(*) from areas) as rows_areas;");
+
+echo "<table>
+  <tr>
+    <th>Rows of Settlements Table</th>
+    <th>Rows of Townships Table</th>
+    <th>Rows of Area Table</th>
+  </tr>";
+$numberOfRows = pg_fetch_assoc($countRows);
+
+echo "
+	<tr>
+		<td>$numberOfRows[rows_settlement]</td>
+		<td>$numberOfRows[rows_townhips]</td>
+		<td>$numberOfRows[rows_areas]</td>
+		
+
+	</tr>";
+echo "</table><br><br>";
+
+$string = $_POST['settlement'];
+
+$result = pg_query($db, "select s.t_v_m as t_v_m, s.name as name,t.name as township, a.name as area
+ from settlements as s,townships as t,areas as a 
+	where LOWER(s.name) = LOWER('$string')
+		and t.township_id=s.township_id 
+		and t.area_id = a.area_id;");
 
 	echo $test;
-echo "<link rel='stylesheet' type='text/css' href='search.css'>";
 
 $check = pg_fetch_assoc($result);
 
 if(empty($check))
 {
- echo "No information in database for this settlement";
+
 }
 else
 {
+$counter = 1;	
 echo "<table>
   <tr>
-    <th>Ekatte</th>
+    <th>Type</th>
     <th>Name</th>
     <th>Township</th>
     <th>Area</th>
@@ -24,7 +52,7 @@ echo "<table>
 
 echo "
 	<tr>
-		<td>$check[ekatte_id]</td>
+		<td>$check[t_v_m]</td>
 		<td>$check[name]</td>
 		<td>$check[township]</td>
 		<td>$check[area]</td>
@@ -33,21 +61,19 @@ echo "
 
 while ($row = pg_fetch_assoc($result))
 {
+	$counter += 1;
 echo"
 	<tr>
-		<td>$row[ekatte_id]</td>
+		<td>$row[t_v_m]</td>
 		<td>$row[name]</td>
 		<td>$row[township]</td>
 		<td>$row[area]</td>
 
 	</tr>";
 }
-echo "</table>";
-
-
+echo "</table><br>";
+echo "There is(are) $counter row(s) with that name";
 
 }
-
-
-
 ?>
+
