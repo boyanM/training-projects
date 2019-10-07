@@ -9,9 +9,11 @@ import requests
 import json
 import random
 import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 
-def requests(g_response):
+def reCAPTCHA(g_response):
 	url = 'https://www.google.com/recaptcha/api/siteverify'
 	payload = {'secret' :'6LclYLoUAAAAAH9eix2giVphRCUAj0I9me0azjkz','response':g_response}
 
@@ -19,44 +21,13 @@ def requests(g_response):
 		r = requests.get(url,params=payload)
 		r_dict = r.json()
 		status = r_dict['success']
-		print(status)
-
+		
 		if status == False:
 			return False
 		else:
 			return True
 	except:
-		print("Error")
-
-def uniqueAttribute(attr,value):
-	result = -1
-	try:
-		connection = psycopg2.connect(dbname="wordpress",
-		user="wpuser",
-		password="password",
-		host="127.0.0.1",
-		port="5432")
-		
-		cursor = connection.cursor()
-		if attr == 'e':
-			checker = "select count(*) from customers where lower(email) = lower(\'"+value+"\');"
-		else:
-			checker = "select count(*) from customers where username = \'"+value+"\';"
-
-		cursor.execute(checker)
-		result = cursor.fetchall()
-		result = int(result[0][0])
-		connection.commit()
-
-	except(Exception,psycopg2.Error) as error:
-		print("Error while connecting to PostgreSQL:",error)
-
-	finally:
-		if connection:
-			cursor.close()
-			connection.close()
-			if result != -1:
-				return result
+		return False
 
 def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 	try:
@@ -69,11 +40,16 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 		cursor = connection.cursor()
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
-		insert = "insert into customers (email,username,password,name,lname,bday,gender,phone,address,conf_token)\
-		values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(email,user,psw,name,lname,bday,gender,phone,address,key)
-		cursor.execute(insert)
+		cursor.execute("insert into customers\
+		 (email,username,password,name,lname,bday,gender,phone,address,conf_token)\
+		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+		,(email,user,psw,name,lname,bday,gender,phone,address,key))
 		connection.commit()
+		return True
 
+	except(Exception,psycopg2.IntegrityError) as err:
+		return False
+		
 	except(Exception,psycopg2.Error) as error:
 		print("Error while connecting to PostgreSQL:",error)
 
@@ -81,7 +57,6 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 		if connection:
 			cursor.close()
 			connection.close()
-			
 
 def lengthCheck(attr,max):
 	if len(attr) <= max:
@@ -105,7 +80,8 @@ def validateDate(date):
 
 
 def generateKey():
-	hexals = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f']
+	hexals = ['0','1','2','3','4','5','6','7','8','9'\
+	,'A','B','C','D','E','F','a','b','c','d','e','f']
 	
 	length = 32
 	key = ""
@@ -115,25 +91,49 @@ def generateKey():
 	
 
 def sendMail(email,key): 
-	port = 465
-	smtp_server = "smtp.yandex.com"
-	sender_email = "boyan.milanov@yandex.com"
-	receiver_email = email
-	password = "Parola42"
 	link = 'http://127.0.0.1:8000/cgi-bin/activation.py?email=%s&token=%s'%(email,key)
-	message = """\
-Subject: Activate your account,
 
-Click the link below to activate your account.
-%s
-Note:
-If you have not registered on this site do nothing!"""%(link)
+
+	sender_email = "boyan.milanov@yandex.com"
+	receiver_email = "boyan.milanov@yandex.com" #emal
+	password = "Parola42"
+	
+	message = MIMEMultipart("alternative")
+	message["Subject"] = "Activate your account"
+	message["From"] = "boyan.milanov@yandex.com"
+	message["To"] = "boyan.milanov@yandex.com"
+	
+	text = """\
+	Hi,
+	Click the link below to activate your account.
+	---
+	Note:
+	If you have not registered on this site do nothing!"""
+	html = """\
+	<html>
+	  <body>
+	    <p>Hello,<br>
+	      Click the link below to activate your account.<br>
+	       <a href="%s">Click here</a> <br>
+	       Note:<br>
+	If you have not registered on this site do nothing!
+	    </p>
+	  </body>
+	</html>
+	"""%(link)
+	
+	part1 = MIMEText(text, "plain")
+	part2 = MIMEText(html, "html")
+	
+	message.attach(part1)
+	message.attach(part2)
 	
 	context = ssl.create_default_context()
-	with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+	with smtplib.SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
 	    server.login(sender_email, password)
-	    server.sendmail(sender_email, receiver_email, message)
-
+	    server.sendmail(
+	        sender_email, receiver_email, message.as_string()
+	    )
 
 
 
@@ -167,7 +167,7 @@ ip = cgi.escape(os.environ["REMOTE_ADDR"])
 
 
 check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
-checkIndexMeanings=["Invalid e-mail","There is already a user with this email address"
+checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
 ,"The username already exists. Please use a different username",
 "Password and Repeat Password don't match", "Username cannot be longer than 30 characters",
 "First name cannot be longer than 30 characters","Invalid date",
@@ -175,16 +175,11 @@ checkIndexMeanings=["Invalid e-mail","There is already a user with this email ad
 "Last name cannot be longer than 30 characters","Password must be at least 8 characters long",
 "Password must contain at least 1 Capital Letter",
 "Password must contain at least 1 Small-Case Letter","Password must contain letters",
-"Please fill in the the reCAPTCHA"]
+"Please check out the reCAPTCHA"]
 
 if match == None: 
 	check[0] = False
-
-if uniqueAttribute('e',email) != 0:
-	check[1] = False
-
-if uniqueAttribute('u',user) != 0:
-	check[2] = False	
+	
 
 if not lengthCheck(user,30):
 	check[4] = False
@@ -225,7 +220,7 @@ if g_response == None:
 	check[14] = False
 
 else:	
-	if requests(g_response) is False:
+	if reCAPTCHA(g_response) is False:
 		check[14] = False
 
 
@@ -242,7 +237,19 @@ for i in check:
 		validation = False
 
 if(validation):
-	print("""Content-type:text/html\r\n\r\n
+
+	key = generateKey()
+	unique = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key)
+
+	if unique is True:
+		plusSign = email.find('+')
+		if plusSign != -1:
+			newMail = email[:plusSign] + '%2B' + email[plusSign+1:]
+			sendMail(newMail,key)
+		else:
+			sendMail(email,key)
+
+		print("""Content-type:text/html\r\n\r\n
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -257,10 +264,13 @@ if(validation):
 		</div>
 	</body>
 </html>""")
-	key = generateKey()
-	newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key)
-	sendMail(email,key)
-else:
+
+	else:
+		validation = False
+		check[1] = False
+
+
+if validation is False:
 	error = ""
 	for i in range(len(check)):
 		if check[i] is False:

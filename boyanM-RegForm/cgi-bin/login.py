@@ -20,7 +20,8 @@ def submitBtn():
 
 
 def failedLogin(user):
-	current_attempt = None
+	current_attempt = False
+	pass_timers = False
 	try:
 		connection = psycopg2.connect(dbname="wordpress",
 		user="wpuser",
@@ -39,7 +40,10 @@ def failedLogin(user):
 		cursor.execute("update customers set failed_attemps=%i\
 		 where username='%s' or email='%s'"%(counter,user,user))
 		connection.commit()
-	
+		
+		cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts from pass_auth;")
+		pass_timers = cursor.fetchall()
+
 	except (Exception,psycopg2.Error) as error:
 		print('Error while connecting to PostgreSQL:',error)
 	
@@ -47,8 +51,7 @@ def failedLogin(user):
 		if connection:
 			cursor.close()
 			connection.close()
-			if current_attempt != None:
-				return current_attempt
+			return (current_attempt,pass_timers)
 
 def searchInDB(user,psw):
 	result = False
@@ -80,34 +83,6 @@ def searchInDB(user,psw):
 			connection.close()
 		return result
 
-def passwordDelay(user):
-
-	try:	
-			wait = 0
-			connection = psycopg2.connect(dbname="wordpress",
-			user="wpuser",
-			password="password",
-			host="127.0.0.1",
-			port="5432")
-			
-			cursor = connection.cursor()
-			cursor.execute("select failed_attemp_time from customers where (username='%s' or email='%s');"%(user,user))
-			lastFail =cursor.fetchone() 
-			connection.commit()
-			if lastFail[0] != None:
-				wait = lastFail[0] + timedelta(seconds = 15)
-
-
-	except(Exception,psycopg2.Error) as error:
-			print("Error while connecting to PostgreSQL:",error)
-	
-	finally:
-		if connection:
-			cursor.close()
-			connection.close()
-			if wait != 0:
-				return wait
-
 form = cgi.FieldStorage()
 
 user = form.getvalue('uname')
@@ -134,7 +109,10 @@ else:
 <link rel="stylesheet" type="text/css" href="../login.css">
 
 </head>""")
-	attempts = failedLogin(user)
+	fail_attempt = failedLogin(user)
+	print(fail_attempt)
+	attempts = fail_attempt[0]
+	time = fail_attempt[1]
 	error = "Invalid Username or Password"
 	
 	print("""<body>
@@ -150,9 +128,14 @@ else:
     <input type="password" placeholder="Enter Password" name="psw" required>
 """%(error,user))  
     
-	if attempts < 5:   
-		t = Timer(5.0,submitBtn)
+	if attempts!= False and attempts < int(time[0][2]):   
+		t = Timer(time[0][0],submitBtn)
 		t.start()
-	else:
-		t = Timer(300.0,submitBtn)
+	elif attempts != False and attempts >= int(time[0][2]):
+		t = Timer(time[0][1],submitBtn)
 		t.start()
+	elif attempts == False:
+		submitBtn()
+print("""
+	</body>
+</html>""")

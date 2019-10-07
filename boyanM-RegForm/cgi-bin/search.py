@@ -3,6 +3,12 @@
 import cgi,cgitb
 import psycopg2
 
+
+form = cgi.FieldStorage()
+pass_auth1_sec = form.getvalue('pass_time')
+pass_auth2_min = form.getvalue('pass_block')
+pass_numOfAttem = form.getvalue('numOfAttempts')
+
 print ("Content-type:text/html\r\n\r\n")
 print ('<html>')
 print ('<head>')
@@ -15,6 +21,7 @@ print ('<body>')
 print('<link rel="stylesheet" type="text/css" href="../search.css">')
 
 print ('<h2>Customers</h2>')
+password_timers = False
 
 try:
 	connection = psycopg2.connect(dbname = 'wordpress',
@@ -35,6 +42,15 @@ try:
 	customers = cursor.fetchall()
 	colnames = [desc[0] for desc in cursor.description]
 
+	cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts from pass_auth;")
+	password_timers = cursor.fetchall()
+	if pass_auth1_sec != password_timers[0][0] or pass_auth2_min != password_timers[0][1]\
+	 or pass_numOfAttem != password_timers[0][2]:
+		cursor.execute("update pass_auth set\
+		 pass_auth1_sec=%i,pass_auth2_min=%i,after_attempts='%i';"
+			%(int(pass_auth1_sec),int(pass_auth2_min),int(pass_numOfAttem)))
+		cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts from pass_auth;")
+		password_timers = cursor.fetchall()	
 	connection.commit()
 
 	
@@ -62,6 +78,23 @@ for i in customers:
 print("</tr>")
 
 print("</table><br><br>")
+
+if(password_timers != False):
+
+	print("""
+		<p><strong>Information for password authentication</strong></p>
+		<hr>
+	<form name="password_timers" method = "POST" action="search.py">
+		<label for="Password_timer"><b>After Wrong Attempt Time(Sec)</b></label>
+    	<input type="number" placeholder="Please enter time " name="pass_time" value="%s" required><br><br>
+		<label for="Password_timer_afterFive"><b>After Five Wrong Attempts Time(Sec)</b></label>
+    	<input type="number" placeholder="Please enter time " name="pass_block" value="%s" required><br><br>
+    	<label for="number_attem"><b>After how many attempts to trigger the big counter</b></label>
+    	<input type="number" placeholder="Please enter number of attempts" name="numOfAttempts" value="%s" required>
+    	<hr>
+    	<button type="submit" class="registerbtn">Save</button>
+	"""%(password_timers[0][0],password_timers[0][1],password_timers[0][2]))
+
 print ('</body>')
 print ('</html>')
 
