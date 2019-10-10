@@ -8,6 +8,7 @@ form = cgi.FieldStorage()
 pass_auth1_sec = form.getvalue('pass_time')
 pass_auth2_min = form.getvalue('pass_block')
 pass_numOfAttem = form.getvalue('numOfAttempts')
+expire_months = form.getvalue('months')
 
 print ("Content-type:text/html\r\n\r\n")
 print ('<html>')
@@ -42,14 +43,14 @@ try:
 	customers = cursor.fetchall()
 	colnames = [desc[0] for desc in cursor.description]
 
-	cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts from pass_auth;")
+	cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts,pass_exp from pass_auth;")
 	password_timers = cursor.fetchall()
 	if pass_auth1_sec != password_timers[0][0] or pass_auth2_min != password_timers[0][1]\
-	 or pass_numOfAttem != password_timers[0][2]:
+	 or pass_numOfAttem != password_timers[0][2] or expire_months != password_timers[0][3]:
 		cursor.execute("update pass_auth set\
-		 pass_auth1_sec=%i,pass_auth2_min=%i,after_attempts='%i';"
-			%(int(pass_auth1_sec),int(pass_auth2_min),int(pass_numOfAttem)))
-		cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts from pass_auth;")
+		 pass_auth1_sec=%s,pass_auth2_min=%s,after_attempts=%s,pass_exp=%s;"
+			,(pass_auth1_sec,pass_auth2_min,pass_numOfAttem,expire_months))
+		cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts,pass_exp from pass_auth;")
 		password_timers = cursor.fetchall()	
 	connection.commit()
 
@@ -90,10 +91,13 @@ if(password_timers != False):
 		<label for="Password_timer_afterFive"><b>After Five Wrong Attempts Time(Sec)</b></label>
     	<input type="number" placeholder="Please enter time " name="pass_block" value="%s" required><br><br>
     	<label for="number_attem"><b>After how many attempts to trigger the big counter</b></label>
-    	<input type="number" placeholder="Please enter number of attempts" name="numOfAttempts" value="%s" required>
+    	<input type="number" placeholder="Please enter number of attempts" name="numOfAttempts" value="%s" required><br><br>
+    	<hr>
+    	<label for="number_attem"><b>Password expires after (seconds)</b></label>
+    	<input type="number" placeholder="Please enter seconds" name="months" value="%s" required>
     	<hr>
     	<button type="submit" class="registerbtn">Save</button>
-	"""%(password_timers[0][0],password_timers[0][1],password_timers[0][2]))
+	"""%(password_timers[0][0],password_timers[0][1],password_timers[0][2],password_timers[0][3]))
 
 print ('</body>')
 print ('</html>')

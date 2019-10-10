@@ -41,9 +41,9 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
 		cursor.execute("insert into customers\
-		 (email,username,password,name,lname,bday,gender,phone,address,conf_token)\
-		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-		,(email,user,psw,name,lname,bday,gender,phone,address,key))
+		 (email,username,password,name,lname,bday,gender,phone,address,conf_token,last_pass_change)\
+		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+		,(email,user,psw,name,lname,bday,gender,phone,address,key,"now()"))
 		connection.commit()
 		return True
 
@@ -118,6 +118,7 @@ def sendMail(email,key):
 	       Note:<br>
 	If you have not registered on this site do nothing!
 	    </p>
+	   <img src="Hello-Transparent.png" alt="hi"> 
 	  </body>
 	</html>
 	"""%(link)
