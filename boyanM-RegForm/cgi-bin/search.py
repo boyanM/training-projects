@@ -45,14 +45,17 @@ try:
 
 	cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts,pass_exp from pass_auth;")
 	password_timers = cursor.fetchall()
-	if pass_auth1_sec != password_timers[0][0] or pass_auth2_min != password_timers[0][1]\
-	 or pass_numOfAttem != password_timers[0][2] or expire_months != password_timers[0][3]:
-		cursor.execute("update pass_auth set\
-		 pass_auth1_sec=%s,pass_auth2_min=%s,after_attempts=%s,pass_exp=%s;"
-			,(pass_auth1_sec,pass_auth2_min,pass_numOfAttem,expire_months))
-		cursor.execute("select pass_auth1_sec, pass_auth2_min, after_attempts,pass_exp from pass_auth;")
-		password_timers = cursor.fetchall()	
-	connection.commit()
+	if None not in password_timers[0] and pass_auth1_sec != None:
+		if pass_auth1_sec != password_timers[0][0] or pass_auth2_min != password_timers[0][1]\
+		 or pass_numOfAttem != password_timers[0][2] or expire_months != password_timers[0][3]:
+			cursor.execute("update pass_auth set\
+			 pass_auth1_sec=%s,pass_auth2_min=%s,after_attempts=%s,pass_exp=%s;"
+				,(pass_auth1_sec,pass_auth2_min,pass_numOfAttem,expire_months))
+			connection.commit()
+			cursor.execute("select pass_auth1_sec,pass_auth2_min, after_attempts,pass_exp from pass_auth;")
+			password_timers = cursor.fetchall()
+
+
 
 	
 		

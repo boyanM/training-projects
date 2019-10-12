@@ -77,7 +77,11 @@ def validateDate(date):
 	else:
 		return False 
 
-
+def validatePhone(tel1,tel2,tel3):
+	if len(str(tel1)) == 2 and len(str(tel2)) == 3 and len(str(tel3)) == 4:
+		return True
+	else:
+		return False	
 
 def generateKey():
 	hexals = ['0','1','2','3','4','5','6','7','8','9'\
@@ -154,7 +158,12 @@ gender = form.getvalue('gender')
 
 bday = form.getvalue('bday')
 
-phone = form.getvalue('phone')
+code = form.getvalue('countryCode')
+tel1 = form.getvalue('tel1')
+tel2 = form.getvalue('tel2')
+tel3 = form.getvalue('tel3')
+phone = str(code) + str(tel1)+ str(tel2)+str(tel3)
+
 
 address = form.getvalue('address')
 
@@ -164,10 +173,7 @@ conf_psw = form.getvalue('psw-repeat')
 
 g_response = form.getvalue('g-recaptcha-response')
 
-ip = cgi.escape(os.environ["REMOTE_ADDR"])
-
-
-check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
 ,"The username already exists. Please use a different username",
 "Password and Repeat Password don't match", "Username cannot be longer than 30 characters",
@@ -176,7 +182,7 @@ checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
 "Last name cannot be longer than 30 characters","Password must be at least 8 characters long",
 "Password must contain at least 1 Capital Letter",
 "Password must contain at least 1 Small-Case Letter","Password must contain letters",
-"Please check out the reCAPTCHA"]
+"Please check out the reCAPTCHA","Password cannot contain the username"]
 
 if match == None: 
 	check[0] = False
@@ -191,14 +197,16 @@ if not lengthCheck(name,30):
 if not validateDate(bday):
 	check[6] = False
 
-if len(phone) != 12:
-	check[7] = False
 
 if not lengthCheck(address,30):
 	check[8] = False
 
 if not lengthCheck(lname,30):
 	check[9] = False	
+
+if not validatePhone(tel1,tel2,tel3):
+	check[7] = False
+
 
 if len(psw) < 8:
 	check[10] = False
@@ -208,14 +216,19 @@ else:
 		check[3] = False
 
 	else:
-		if not psw.upper().isupper():
-			check[13] = False
-		else:
-			if psw.islower():
-				check[11] = False
+		if psw.find(user) != -1:
+			check[15] = False
+		else:	
+			if not psw.upper().isupper():
+				check[13] = False
+			else:
+				if psw.islower():
+					check[11] = False
 
-			if psw.isupper():
-				check[12] = False	
+				if psw.isupper():
+					check[12] = False	
+
+			 
 
 if g_response == None:
 	check[14] = False
@@ -276,7 +289,6 @@ if validation is False:
 	for i in range(len(check)):
 		if check[i] is False:
 			error += checkIndexMeanings[i] + "<br>"
-
 	print("""Content-type:text/html\r\n\r\n
 <html>
 <head>
@@ -325,8 +337,54 @@ if validation is False:
 	print("""<label for="bday"><b>Birthday date</b></label>
   <input type="date" placeholder="Enter Birthday date" name="bday" value="%s">
 
-  <label for="phone"><b>Phone</b></label>
-  <input type="number" placeholder="Enter Phone" name="phone" value ="%s">
+  <label for="phone"><b>Phone</b></label><br>
+    <select name="countryCode" style = "width:150px; heigth:10px">
+        <option data-countryCode="GB" value="44" Selected>UK (+44)</option>
+        <option data-countryCode="US" value="1">USA (+1)</option>
+        <option data-countryCode="BG" value="359">BG (+359)</option>
+      <optgroup label="Other countries">
+        <option data-countryCode="DZ" value="213">Algeria (+213)</option>
+        <option data-countryCode="AD" value="376">Andorra (+376)</option>
+        <option data-countryCode="AO" value="244">Angola (+244)</option>
+        <option data-countryCode="AI" value="1264">Anguilla (+1264)</option>
+        <option data-countryCode="AG" value="1268">Antigua &amp; Barbuda (+1268)</option>
+        <option data-countryCode="AR" value="54">Argentina (+54)</option>
+        <option data-countryCode="AM" value="374">Armenia (+374)</option>
+        <option data-countryCode="AW" value="297">Aruba (+297)</option>
+        <option data-countryCode="AU" value="61">Australia (+61)</option>
+        <option data-countryCode="AT" value="43">Austria (+43)</option>
+        <option data-countryCode="AZ" value="994">Azerbaijan (+994)</option>
+        <option data-countryCode="BS" value="1242">Bahamas (+1242)</option>
+        <option data-countryCode="BH" value="973">Bahrain (+973)</option>
+        <option data-countryCode="BD" value="880">Bangladesh (+880)</option>
+        <option data-countryCode="BB" value="1246">Barbados (+1246)</option>
+        <option data-countryCode="BY" value="375">Belarus (+375)</option>
+        <option data-countryCode="BE" value="32">Belgium (+32)</option>
+        <option data-countryCode="BZ" value="501">Belize (+501)</option>
+        <option data-countryCode="BJ" value="229">Benin (+229)</option>
+        <option data-countryCode="BM" value="1441">Bermuda (+1441)</option>
+        <option data-countryCode="BT" value="975">Bhutan (+975)</option>
+        <option data-countryCode="BO" value="591">Bolivia (+591)</option>
+        <option data-countryCode="BA" value="387">Bosnia Herzegovina (+387)</option>
+        <option data-countryCode="BW" value="267">Botswana (+267)</option>
+        <option data-countryCode="BR" value="55">Brazil (+55)</option>
+        <option data-countryCode="BN" value="673">Brunei (+673)</option>
+        <option data-countryCode="BG" value="359">Bulgaria (+359)</option>
+        <option data-countryCode="BF" value="226">Burkina Faso (+226)</option>
+        <option data-countryCode="BI" value="257">Burundi (+257)</option>
+    </optgroup>
+  </select>
+
+  (<input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
+  onKeyPress="if(this.value.length==2) return false;" placeholder="88"
+  value="%s" name="tel1" min="0" required> ) - 
+  <input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
+  onKeyPress="if(this.value.length==3) return false;" placeholder="571"
+  value="%s" name="tel2" min="0" required> -
+  <input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
+  onKeyPress="if(this.value.length==4) return false;" placeholder="3019"
+  value="%s" name="tel3" min="0" required>
+  <br>
 
   <label for="address"><b>Address</b></label>
   <input type="text" placeholder="Enter Address" name="address" value ="%s">
@@ -346,4 +404,4 @@ if validation is False:
 </div>
 
 </body>
-</html>"""%(bday,phone,address))
+</html>"""%(bday,tel1,tel2,tel3,address))

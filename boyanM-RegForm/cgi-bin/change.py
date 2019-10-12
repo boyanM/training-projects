@@ -98,7 +98,7 @@ else:
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
 		cursor.execute("update customers set password=%s,last_pass_change=%s\
-		 where email=%s;",(psw,"now()",email))
+		 where email=%s or username=%s;",(psw,"now()",email,email))
 		connection.commit()
 		
 			

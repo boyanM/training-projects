@@ -4,8 +4,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<!-- Calendar -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script type="text/javascript" src="calendar.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+
 </head>
 <body>
+
 <div id="wrapper">
 <form name="reg_form" method = "POST" action="/cgi-bin/reg_form.py">
   <div class="container">
@@ -36,10 +46,54 @@
   <input type="radio" name="gender" value="female"> Female<br><br>
 
   <label for="bday"><b>Birthday date</b></label>
-  <input type="date" placeholder="Enter Birthday date" name="bday" required>
+  <!--<input type="date" placeholder="Enter Birthday date" name="bday" required> -->
+  <input type="text" name="birthday" value="10/24/1984" />
 
-  <label for="phone"><b>Phone</b></label>
-  <input type="number" placeholder="Enter Phone" name="phone" required>
+  <label for="phone"><b>Phone</b></label><br>
+    <select name="countryCode" style = "width:150px; heigth:10px">
+        <option data-countryCode="GB" value="44" Selected>UK (+44)</option>
+        <option data-countryCode="US" value="1">USA (+1)</option>
+        <option data-countryCode="BG" value="359">BG (+359)</option>
+      <optgroup label="Other countries">
+        <option data-countryCode="DZ" value="213">Algeria (+213)</option>
+        <option data-countryCode="AD" value="376">Andorra (+376)</option>
+        <option data-countryCode="AO" value="244">Angola (+244)</option>
+        <option data-countryCode="AI" value="1264">Anguilla (+1264)</option>
+        <option data-countryCode="AG" value="1268">Antigua &amp; Barbuda (+1268)</option>
+        <option data-countryCode="AR" value="54">Argentina (+54)</option>
+        <option data-countryCode="AM" value="374">Armenia (+374)</option>
+        <option data-countryCode="AW" value="297">Aruba (+297)</option>
+        <option data-countryCode="AU" value="61">Australia (+61)</option>
+        <option data-countryCode="AT" value="43">Austria (+43)</option>
+        <option data-countryCode="AZ" value="994">Azerbaijan (+994)</option>
+        <option data-countryCode="BS" value="1242">Bahamas (+1242)</option>
+        <option data-countryCode="BH" value="973">Bahrain (+973)</option>
+        <option data-countryCode="BD" value="880">Bangladesh (+880)</option>
+        <option data-countryCode="BB" value="1246">Barbados (+1246)</option>
+        <option data-countryCode="BY" value="375">Belarus (+375)</option>
+        <option data-countryCode="BE" value="32">Belgium (+32)</option>
+        <option data-countryCode="BZ" value="501">Belize (+501)</option>
+        <option data-countryCode="BJ" value="229">Benin (+229)</option>
+        <option data-countryCode="BM" value="1441">Bermuda (+1441)</option>
+        <option data-countryCode="BT" value="975">Bhutan (+975)</option>
+        <option data-countryCode="BO" value="591">Bolivia (+591)</option>
+        <option data-countryCode="BA" value="387">Bosnia Herzegovina (+387)</option>
+        <option data-countryCode="BW" value="267">Botswana (+267)</option>
+        <option data-countryCode="BR" value="55">Brazil (+55)</option>
+        <option data-countryCode="BN" value="673">Brunei (+673)</option>
+        <option data-countryCode="BG" value="359">Bulgaria (+359)</option>
+        <option data-countryCode="BF" value="226">Burkina Faso (+226)</option>
+        <option data-countryCode="BI" value="257">Burundi (+257)</option>
+    </optgroup>
+  </select>
+
+  (<input type="number" class="tel" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==2) return false;" placeholder="88" name="tel1" min="0" required> ) - 
+  <input type="number" class="tel" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==3) return false;" placeholder="571" name="tel2" min="0" required> -
+  <input type="number" class="tel" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==4) return false;" placeholder="3019" name="tel3" min="0" required>
+  <br>
+
+  <label for="Country"><b>Country</b></label>
+  <input type="text" placeholder="Enter Country ex. Bulgaria" name="Country" required>
 
   <label for="address"><b>Address</b></label>
   <input type="text" placeholder="Enter Address" name="address" required>
