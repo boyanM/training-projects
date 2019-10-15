@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="bg">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset=utf-8>
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
@@ -9,10 +10,12 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<script type="text/javascript" src="calendar.js"></script>
+<script type="text/javascript" src="/js/calendar.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
-
+<!-- Search in DB -->
+<script type="text/javascript" src="/js/showhint_countries.js"></script>
+<script type="text/javascript" src="/js/showhint_ekatte.js"></script>
 </head>
 <body>
 
@@ -93,10 +96,10 @@
   <br>
 
   <label for="Country"><b>Country</b></label>
-  <input type="text" placeholder="Enter Country ex. Bulgaria" name="Country" required>
+  <input type="text" onkeyup="showHint(this.value)" placeholder="Enter Country ex. Bulgaria" name="Country" id="txtHint" list="countries" required>
 
   <label for="address"><b>Address</b></label>
-  <input type="text" placeholder="Enter Address" name="address" required>
+  <input type="text" onkeyup="hint(this.value)" placeholder="Enter Address ex. София" name="address" id="ekatteHint" list="ekatte" required>
 
   <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>
   

@@ -29,7 +29,7 @@ def reCAPTCHA(g_response):
 	except:
 		return False
 
-def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
+def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country):
 	try:
 		connection = psycopg2.connect(dbname="wordpress",
 		user="wpuser",
@@ -41,9 +41,11 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key):
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
 		cursor.execute("insert into customers\
-		 (email,username,password,name,lname,bday,gender,phone,address,conf_token,last_pass_change)\
-		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-		,(email,user,psw,name,lname,bday,gender,phone,address,key,"now()"))
+		 (email,username,password,name,lname,bday,gender,phone,\
+		address,conf_token,last_pass_change,country_id)\
+		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,(select id from countries\
+		where lower(country)=lower(%s)))"\
+		,(email,user,psw,name,lname,bday,gender,phone,address,key,"now()",country))
 		connection.commit()
 		return True
 
@@ -65,8 +67,9 @@ def lengthCheck(attr,max):
 		return False
 
 def validateDate(date):
+
 	index = date.find('-')
-	year = date[:index]
+	year = date[-4:]
 	year = int(year)
 	currentyear = str(datetime.date.today())
 	index = currentyear.find('-')
@@ -156,7 +159,7 @@ lname = form.getvalue('lname')
 
 gender = form.getvalue('gender')
 
-bday = form.getvalue('bday')
+bday = form.getvalue('birthday')
 
 code = form.getvalue('countryCode')
 tel1 = form.getvalue('tel1')
@@ -172,6 +175,8 @@ psw = form.getvalue('psw')
 conf_psw = form.getvalue('psw-repeat')
 
 g_response = form.getvalue('g-recaptcha-response')
+
+country = form.getvalue('Country')
 
 check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
@@ -253,7 +258,7 @@ for i in check:
 if(validation):
 
 	key = generateKey()
-	unique = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key)
+	unique = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
 
 	if unique is True:
 		plusSign = email.find('+')
@@ -295,6 +300,19 @@ if validation is False:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<!-- Calendar -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script type="text/javascript" src="/js/calendar.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<!-- Search in DB -->
+<script type="text/javascript" src="/js/showhint_countries.js"></script>
+<script type="text/javascript" src="/js/showhint_ekatte.js"></script>
+
+
 </head>
 <body>
 <div id="wrapper">
@@ -335,7 +353,7 @@ if validation is False:
 	""")
 
 	print("""<label for="bday"><b>Birthday date</b></label>
-  <input type="date" placeholder="Enter Birthday date" name="bday" value="%s">
+  <input type="text" id="txtHint" name="birthday" value="%s">
 
   <label for="phone"><b>Phone</b></label><br>
     <select name="countryCode" style = "width:150px; heigth:10px">
@@ -386,6 +404,11 @@ if validation is False:
   value="%s" name="tel3" min="0" required>
   <br>
 
+  <label for="Country"><b>Country</b></label>
+  <input type="text" onkeyup="showHint(this.value)"
+   placeholder="Enter Country ex. Bulgaria" name="Country"
+   value="%s" list="countries" required>
+
   <label for="address"><b>Address</b></label>
   <input type="text" placeholder="Enter Address" name="address" value ="%s">
 
@@ -404,4 +427,4 @@ if validation is False:
 </div>
 
 </body>
-</html>"""%(bday,tel1,tel2,tel3,address))
+</html>"""%(bday,tel1,tel2,tel3,country,address))
