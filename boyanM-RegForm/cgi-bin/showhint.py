@@ -2,7 +2,7 @@
 
 import psycopg2
 import cgi,cgitb
-
+import json
 
 form = cgi.FieldStorage()
 
@@ -29,6 +29,7 @@ try:
 	for i in range(len(result)):
 		print('<option value="%s">'%(result[i][0]))
 	print('</datalist>')
+
 
 
 except (Exception,psycopg2.Error) as error:

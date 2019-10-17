@@ -40,12 +40,16 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
 		cursor = connection.cursor()
 		hash = pbkdf2_sha256.hash(psw)
 		psw = hash
+
+		add_list = address.split()
+		add_list[0] = add_list[0][1:-1]
+
 		cursor.execute("insert into customers\
 		 (email,username,password,name,lname,bday,gender,phone,\
 		address,conf_token,last_pass_change,country_id)\
 		values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,(select id from countries\
 		where lower(country)=lower(%s)))"\
-		,(email,user,psw,name,lname,bday,gender,phone,address,key,"now()",country))
+		,(email,user,psw,name,lname,bday,gender,phone,int(add_list[0]),key,"now()",country))
 		connection.commit()
 		return True
 
@@ -258,9 +262,9 @@ for i in check:
 if(validation):
 
 	key = generateKey()
-	unique = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
+	add = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
 
-	if unique is True:
+	if add is True:
 		plusSign = email.find('+')
 		if plusSign != -1:
 			newMail = email[:plusSign] + '%2B' + email[plusSign+1:]
@@ -295,8 +299,10 @@ if validation is False:
 		if check[i] is False:
 			error += checkIndexMeanings[i] + "<br>"
 	print("""Content-type:text/html\r\n\r\n
-<html>
+<html lang="bg">
+
 <head>
+<meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -353,7 +359,7 @@ if validation is False:
 	""")
 
 	print("""<label for="bday"><b>Birthday date</b></label>
-  <input type="text" id="txtHint" name="birthday" value="%s">
+  <input type="text" name="birthday" value="%s">
 
   <label for="phone"><b>Phone</b></label><br>
     <select name="countryCode" style = "width:150px; heigth:10px">
@@ -407,10 +413,12 @@ if validation is False:
   <label for="Country"><b>Country</b></label>
   <input type="text" onkeyup="showHint(this.value)"
    placeholder="Enter Country ex. Bulgaria" name="Country"
-   value="%s" list="countries" required>
+   value="%s" id="txtHint" list="countries" required>
 
   <label for="address"><b>Address</b></label>
-  <input type="text" placeholder="Enter Address" name="address" value ="%s">
+  <input type="text" onkeyup="hint(this.value)"
+   placeholder="Enter Address ex. София" name="address"
+   value="%s" id="ekatteHint" list="ekatte" required>
 
   <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>
   

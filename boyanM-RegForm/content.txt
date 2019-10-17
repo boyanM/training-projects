@@ -1,31 +1,92 @@
-====================================================================================================
+=============================================================================================
 Registration&Login&Other_functionalities
 
 
 Content:
-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 
 Registration form:
 
 1. E-mail
-2. Name, Family name
+2. Username
 3. Password, Confirm Password
-4. Agree with terms
-5. Tel.
-6. Address.
-7. Gender
-8. Recaptcha
-9. Username
-10. Data of birth
-11. Check for no empty fields
+4. Name, Last name
+5. Gender
+6. Data of birth
+7. Phone
+8. Country
+9. Address
+10. Agree with terms
+11. Recaptcha
+12. Login Link
+13. Register Button
 
-
-----------------------------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------------------
 Login :
 1. Username or E-mail
 2. Password
-3. Forgot Password
-4. Forgot Username
+3. Forgot Password Link
+4. Create account Link
 
-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+Admin Panel:
+1. Shows all users in the database
+2. Options for block time after first wrong attempt & block time after N wrong attempts & N 	wrong attempts
+3. After what time user needs to change his password
+
+---------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+---------------------------------------------------------------------------------------------
+
+Functionalities - Reg Form:
+
+	1. Validations:
+		- Check for all fields filled	
+		- Check for unique user and emails	
+		- Check for password match
+		- Check for no empty fields
+		- Check lenght of different types
+		- Check for valid date (Cannot be older than 150 years)
+		- Check for phone
+		- Check first & last name not more than 30 characters
+		- Check for password security
+			-Min 8 characters
+			-At least one Capital Letter
+			-At least one Smaller Letter
+			-At least one non-specific character [a-z] || [A-Z]
+			-No username in the password
+		- Check for reCaptchaV2 succeful pass			
+
+	2. On succesful registration
+		- Sent e-mail to user to verify the e-mail & activate the profile
+		- Insert into database (name: wordpress) information about the username
+
+	3. On failed registration
+		- Only the password, agree with terms and reCaptcha fields are reset other field save their content and on the top are error messages why the registration failed
+
+	4. Auto-fill county & address fields in registration form
+		- AJAX request from the form to Python scipt which prints <datalist> attr of the 		input tag	
+
+---------------------------------------------------------------------------------------------
+Functionalities - Login Form:
+	
+	1. Validations:
+		- Check if the password matches the user/e-mail address in DB
+		- Check password expiration date(time)
+		- Check is there any time to next login attempt
+
+	2. Password recovery
+		- Sending e-mail with link from which the user can change his password
+
+---------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+---------------------------------------------------------------------------------------------
+
+Database wordpress:
+Users: wpuser , wp_read
+Password: @@@@ , @@@@
+
+Table Customers - with information from registration form + failed attempts & pass recovery
+
+Database ekatte:
+Used for auto-filling in address field

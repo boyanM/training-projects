@@ -143,14 +143,17 @@ fail_attempt = failedLogin(user)
 attempts = fail_attempt[0]
 time = (int(fail_attempt[1][0][0]),int(fail_attempt[1][0][1]),int(fail_attempt[1][0][2]))
 failed_login = fail_attempt[2]
+if failed_login == None and (result == True or result == -1):
+	wait = False
 
-current_time = datetime.datetime.now()
-difference_login = current_time - failed_login
-difference_login = int(str(difference_login.seconds))
+else:	
+	current_time = datetime.datetime.now()
+	difference_login = current_time - failed_login
+	difference_login = int(str(difference_login.seconds))
 
-wait = False
-if difference_login < time[0] or difference_login < time[2]:
-	wait = True
+	wait = False
+	if difference_login < time[0] or difference_login < time[2]:
+		wait = True
 
 if result == True and wait != True:
 		print("""Content-type:text/html\r\n\r\n
