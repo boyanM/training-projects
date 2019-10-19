@@ -4,14 +4,14 @@ import cgi,cgitb
 from passlib.hash import pbkdf2_sha256
 import psycopg2
 import os
-from threading import Timer
 import datetime
 
 
 def loginHTML(user):
 	html = """Content-type:text/html\r\n\r\n
-<html>
+<html lang="bg">
 <head>
+<meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../login.css">
 
@@ -44,10 +44,10 @@ Invalid Username or Password
 
 
 def failedLogin(user):
-	current_attempt = False
 	pass_timers = False
 	last_login = False
-
+	current_attempt = 0
+	
 	try:
 		connection = psycopg2.connect(dbname="wordpress",
 		user="wpuser",
@@ -62,17 +62,17 @@ def failedLogin(user):
 
 		cursor.execute("select failed_attemps,failed_login from customers\
 		where (username=%s or email=%s);",(user,user))
-		counter = cursor.fetchone()
-		last_login = counter[1]
+		counter = cursor.fetchall()
 		
-		current_time = datetime.datetime.now()
-		difference_login = current_time - last_login
-		difference_login = int(str(difference_login.seconds))
+		last_login = counter[0][1]
+		if last_login != None:
+			current_time = datetime.datetime.now()
+			difference_login = current_time - last_login
+			difference_login = int(str(difference_login.seconds))
 		
-		counter = counter[0]
-		print(pass_timers)
-		if (difference_login < pass_timers[0][0] or difference_login < pass_timers[0][2])\
-		 and last_login != None:
+		counter = counter[0][0]
+		if last_login != None and \
+		(difference_login < pass_timers[0][0] or difference_login < pass_timers[0][2]):
 			current_attempt = counter
 
 		else:	
@@ -91,6 +91,7 @@ def failedLogin(user):
 		if connection:
 			cursor.close()
 			connection.close()
+			print(current_attempt,pass_timers,last_login)
 			return (current_attempt,pass_timers,last_login)
 
 def validate(user,psw):
@@ -139,21 +140,22 @@ password = form.getvalue('psw')
 
 result = validate(user,password)
 
-fail_attempt = failedLogin(user)
-attempts = fail_attempt[0]
-time = (int(fail_attempt[1][0][0]),int(fail_attempt[1][0][1]),int(fail_attempt[1][0][2]))
-failed_login = fail_attempt[2]
-if failed_login == None and (result == True or result == -1):
-	wait = False
+wait = False
 
-else:	
-	current_time = datetime.datetime.now()
-	difference_login = current_time - failed_login
-	difference_login = int(str(difference_login.seconds))
+if result != True:
+	fail_attempt = failedLogin(user)
+	attempts = fail_attempt[0]
+	time = (int(fail_attempt[1][0][0]),int(fail_attempt[1][0][1]),int(fail_attempt[1][0][2]))
+	failed_login = fail_attempt[2]
 
-	wait = False
-	if difference_login < time[0] or difference_login < time[2]:
-		wait = True
+
+	if failed_login != None and (result != True or result != -1):
+		current_time = datetime.datetime.now()
+		difference_login = current_time - failed_login
+		difference_login = int(str(difference_login.seconds))
+
+		if difference_login < time[0] or difference_login < time[2]:
+			wait = True
 
 if result == True and wait != True:
 		print("""Content-type:text/html\r\n\r\n
@@ -172,8 +174,9 @@ elif result == -1 and wait != True:
 	else:
 		link = "change.py?email=" + user
 	print("""Content-type:text/html\r\n\r\n
-<html>
+<html lang="bg">
 <head>
+<meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../login.css">
 
@@ -198,11 +201,12 @@ elif result == -1 and wait != True:
 </html>"""%(link))
 
 else:
-	if attempts != False and attempts < time[1] and failed_login != False:   
+	if failed_login != None and attempts < time[1]:   
 		if difference_login < time[0]:
 			print("""Content-type:text/html\r\n\r\n
-<html>
+<html lang="bg">
 <head>
+<meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../login.css">
 
@@ -235,14 +239,14 @@ Wait %s seconds till next attempt
 		else:
 			loginHTML(user)	
 
-	elif attempts != False and attempts >= time[1] and failed_login != False:
+	elif failed_login != None and attempts >= time[1]:
 		if difference_login < time[2]:
 			print("""Content-type:text/html\r\n\r\n
-<html>
+<html lang="bg">
 <head>
+<meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="../login.css">
-
 </head>
 <body>
 <div>

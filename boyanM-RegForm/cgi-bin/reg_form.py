@@ -315,8 +315,7 @@ if validation is False:
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <!-- Search in DB -->
-<script type="text/javascript" src="/js/showhint_countries.js"></script>
-<script type="text/javascript" src="/js/showhint_ekatte.js"></script>
+<script type="text/javascript" src="/js/showhint"></script>
 
 
 </head>
