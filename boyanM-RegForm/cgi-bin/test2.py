@@ -1,27 +1,18 @@
 #!/usr/bin/python3
 
 import psycopg2
-import cgi,cgitb
+from callDB import callDB
 
-try:
-	connection = psycopg2.connect(dbname="wordpress",
-	user="wpuser",
-	password="password",
-	host="127.0.0.1",
-	port="5432")
 
-	cursor = connection.cursor()
-		
-	cursor.execute("select failed_attemps,failed_login from customers\
-		where (username='boyan' or email='boyan10');")
-	p = cursor.fetchall()
 
-	print(p)
+db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+db.closeDB()
 
-except (Exception,psycopg2.Error) as error:
-	print('Error while connecting to PostgreSQL:',error)
-	
-finally:
-	if connection:
-		cursor.close()
-		connection.close()
+cursor =db.getCursorDB()
+cursor.execute("select username from customers where username='boyan10';")
+
+
+
+check = db.queryDB("select id from customers where username=%s",'boyan10')
+#check = db.executeDB("update customers set email=%s where username=%s",'boyan1044@gmail.com','boyan10')
+print(check)
