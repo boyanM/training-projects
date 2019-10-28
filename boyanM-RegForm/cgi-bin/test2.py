@@ -1,18 +1,21 @@
 #!/usr/bin/python3
-
-import psycopg2
+# -*- coding: utf-8 -*-
+import cgi,cgitb
+import json
 from callDB import callDB
 
+wp_db = callDB('ekatte','ekatte_read','1111','127.0.0.1','5432')
 
+users = wp_db.queryDB('select name from settlements where id =6')
+print(users)
+user = users[0][0]
 
-db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-db.closeDB()
+info = user
 
-cursor =db.getCursorDB()
-cursor.execute("select username from customers where username='boyan10';")
-
-
-
-check = db.queryDB("select id from customers where username=%s",'boyan10')
-#check = db.executeDB("update customers set email=%s where username=%s",'boyan1044@gmail.com','boyan10')
-print(check)
+print("""Content-type:text/html\r\n\r\n
+	<html>
+	<head>
+        <meta charset="UTF-8">
+    </head>
+    %s
+"""%info)
