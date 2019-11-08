@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+}
+
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+#customers{
+  display: none;
+}
+
+#btn_cust1{
+  display: inline-block;
+}
+
+#btn_cust2{
+  display: none;
+}
+
+#timer{
+  display: none;
+}
+
+#user_timeout{
+  display: none;
+}
+
+#btn_timer1{
+  display: inline-block;
+}
+
+#btn_timer2{
+  display: none;
+}
+
+#btn_timeout1{
+  display: inline-block;
+}
+
+#btn_timeout2{
+  display: none;
+}
