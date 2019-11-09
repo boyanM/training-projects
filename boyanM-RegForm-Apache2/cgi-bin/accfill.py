@@ -49,7 +49,12 @@ user_data = wp_db.queryDB('select cu.username,cu.email,c.country,cu.address,cu.p
 wp_db.closeDB()
 
 ekatte_db = callDB('ekatte','ekatte_read','1111','127.0.0.1','5432')
+print(user)
+
 ekatte_data = ekatte_db.queryDB('select id,name from settlements where id=%s;',user_data[0][3])
+if len(ekatte_data) == 0:
+	ekatte_data = ekatte_db.queryDB('select id,name from settlements where id=%s;',username)
+
 ekatte_db.closeDB()
 
 if username == None and password == None and password_repeat == None and mail == None \
@@ -182,76 +187,162 @@ else:
 	new_add = address.split()
 	new_add = new_add[0][1:-1]
 	address = "[1] a"
-
+	error = ""
 
 	wp_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-	country_id = wp_db.queryDB('select id from countries where country=%s',country)
-	country_id = country_id[0][0]
-	wp_db.executeDB('update customers set username=%s,\
-		email=%s,country_id=%s,address=%s,phone=%s;',
-		username,mail,country_id,new_add,phone)
+	if username != user_data[0][0]:
+		change = wp_db.executeDB('update customers set username=%s\
+		 where username=%s',username,user_data[0][0])
+		if change == False:
+			error += "The username already exists. Please use a different username. <br>"
 	
 	if password != None:
-		hash = pbkdf2_sha256.hash(password)
-		new_pass = hash
-		wp_db.executeDB('update customers set password=%s',new_pass)
+		if password == password_repeat:
+			hash = pbkdf2_sha256.hash(password)
+			new_pass = hash
+			wp_db.executeDB('update customers set password=%s\
+			 where username=%s',new_pass,username)
+		else:
+			error += "Password and Repeat password don't match ! <br>"	
+	
+	if mail != user_data[0][1]:
+		change = wp_db.executeDB('update customers set email=%s\
+		 where username=%s',mail,username)
+		if change == False:
+			error += "The email already exists. Please use a different email <br>"
+
+	country_id =""
+	if country != user_data[0][2]:
+		country_id = wp_db.queryDB('select id from countries where country=%s',country)
+		country_id = country_id[0][0]
+		wp_db.executeDB('update customers set country_id=%s\
+		 where username=%s',country_id,username)
+
+	if address != ekatte_data[0][0]:
+		wp_db.executeDB('update customers set address=%s\
+		 where username=%s',new_add,username)
+	
+	if phone !=user_data[0][4]:
+		wp_db.executeDB('update customers set phone=%s\
+		 where username=%s',phone,username)
 	
 	wp_db.closeDB()
-	
-	print('''
-	<link rel="stylesheet" type="text/css" href="../style1.css">
-	<script type="text/javascript" src="http://test.com/js/editacc.js"></script>
-	<script type="text/javascript" src="http://test.com/js/showhint.js"></script>
-	''')
-	
-	print('<p id="open">Welcome %s</p>'%(username))
-	print("<br>")
-	print('<hr>')
-	print("""
-			<form name="edit_acc" method="POST" 
-			 action="http://test.com/cgi-bin/accfill.py?acc=%s">
-			<label>Username</label>
-			<input type="text" class="acc_field" name="username" value=%s disabled required>
-			
-			<label>Password</label>
-			<input type="password" class="acc_field" id="psw" name="psw" disabled>
-			 	
-			 	<div id="message">
-				  <h3>Password must contain the following:</h3>
-				  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
-				  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
-				  <p id="number" class="invalid">A <b>number</b></p>
-				  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
-				</div>
-	
-			<label id="psw_repeat_label">Repeat Password</label>
-			<input type="password" class="acc_field" id="psw_repeat" name="psw_repeat" disabled>
-	
-			<label>E-mail</label>
-			<input type="text" class="acc_field" name="mail" value=%s disabled required>
-			
-			<label for="Country">Country</label>
-	  		<input type="text" onkeyup="showHint(this.value)" value=%s name="country"
-	  		 id="txtHint" class="acc_field" list="countries" disabled required>
-	
-			<label for="address">Address</label>
-	  		<input type="text" onkeyup="hint(this.value)" name="address"
-	  		 id="ekatteHint" class="acc_field"list="ekatte" value=%s disabled required>
-	
-			<label>Phone</label>
-			<input type="text" class="acc_field" name="phone" value=%s disabled required>
-		"""%(username,username,user_data[0][1],user_data[0][2],address,user_data[0][4]))
-	
-	print('<hr>')
-	
-	print('<button type="button" id="edit" onclick="editAcc()">Edit profile</button>')
-	print('<input type="submit" id="save_btn" value="Save">')
-	print('</form>')
-	print('</body>')
-	print('</html>')
 
-	print('<hr>')
+	if error != "":
+		print('''
+		<link rel="stylesheet" type="text/css" href="../style1.css">
+		<script type="text/javascript" src="http://test.com/js/editacc.js"></script>
+		<script type="text/javascript" src="http://test.com/js/showhint.js"></script>
+		''')
+		print('<p>%s<p>'%(error))
+		print('<p id="open">Welcome %s</p>'%(user_data[0][0]))
+		print("<br>")
+		print('<hr>')
+		print("""
+				<form name="edit_acc" method="POST" 
+				 action="http://test.com/cgi-bin/accfill.py?acc=%s">
+				<label>Username</label>
+				<input type="text" class="acc_field" name="username" value=%s disabled required>
+				
+				<label>Password</label>
+				<input type="password" class="acc_field" id="psw" name="psw" disabled>
+				 	
+				 	<div id="message">
+					  <h3>Password must contain the following:</h3>
+					  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+					  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+					  <p id="number" class="invalid">A <b>number</b></p>
+					  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+					</div>
+		
+				<label id="psw_repeat_label">Repeat Password</label>
+				<input type="password" class="acc_field" id="psw_repeat" name="psw_repeat" disabled>
+		
+				<label>E-mail</label>
+				<input type="text" class="acc_field" name="mail" value=%s disabled required>
+				
+				<label for="Country">Country</label>
+		  		<input type="text" onkeyup="showHint(this.value)" value=%s name="country"
+		  		 id="txtHint" class="acc_field" list="countries" disabled required>
+		
+				<label for="address">Address</label>
+		  		<input type="text" onkeyup="hint(this.value)" name="address"
+		  		 id="ekatteHint" class="acc_field"list="ekatte" value=%s disabled required>
+		
+				<label>Phone</label>
+				<input type="text" class="acc_field" name="phone" value=%s disabled required>
+			"""%(user_data[0][0],user_data[0][0],user_data[0][1],user_data[0][2],address,user_data[0][4]))
+		
+		print('<hr>')
+		
+		print('<button type="button" id="edit" onclick="editAcc()">Edit profile</button>')
+		print('<input type="submit" id="save_btn" value="Save">')
+		print('</form>')
+		print('</body>')
+		print('</html>')
+
+		print('<hr>')
 
 
-	print('</body>')
-	print('</html>')
+		print('</body>')
+		print('</html>')
+
+
+	else:
+		print('''
+		<link rel="stylesheet" type="text/css" href="../style1.css">
+		<script type="text/javascript" src="http://test.com/js/editacc.js"></script>
+		<script type="text/javascript" src="http://test.com/js/showhint.js"></script>
+		''')
+		print('<p> Succesful update<p>')
+		print('<p id="open">Welcome %s</p>'%(username))
+		print("<br>")
+		print('<hr>')
+		print("""
+				<form name="edit_acc" method="POST" 
+				 action="http://test.com/cgi-bin/accfill.py?acc=%s">
+				<label>Username</label>
+				<input type="text" class="acc_field" name="username" value=%s disabled required>
+				
+				<label>Password</label>
+				<input type="password" class="acc_field" id="psw" name="psw" disabled>
+				 	
+				 	<div id="message">
+					  <h3>Password must contain the following:</h3>
+					  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+					  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+					  <p id="number" class="invalid">A <b>number</b></p>
+					  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+					</div>
+		
+				<label id="psw_repeat_label">Repeat Password</label>
+				<input type="password" class="acc_field" id="psw_repeat" name="psw_repeat" disabled>
+		
+				<label>E-mail</label>
+				<input type="text" class="acc_field" name="mail" value=%s disabled required>
+				
+				<label for="Country">Country</label>
+		  		<input type="text" onkeyup="showHint(this.value)" value=%s name="country"
+		  		 id="txtHint" class="acc_field" list="countries" disabled required>
+		
+				<label for="address">Address</label>
+		  		<input type="text" onkeyup="hint(this.value)" name="address"
+		  		 id="ekatteHint" class="acc_field"list="ekatte" value=%s disabled required>
+		
+				<label>Phone</label>
+				<input type="text" class="acc_field" name="phone" value=%s disabled required>
+			"""%(username,username,mail,country_id,address,phone))
+		
+		print('<hr>')
+		
+		print('<button type="button" id="edit" onclick="editAcc()">Edit profile</button>')
+		print('<input type="submit" id="save_btn" value="Save">')
+		print('</form>')
+		print('</body>')
+		print('</html>')
+
+		print('<hr>')
+
+
+		print('</body>')
+		print('</html>')

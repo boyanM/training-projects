@@ -22,7 +22,7 @@
 				header("Location: http://test.com/login.html");
 			}
 	}
-
+	
 	
 	print_r($_SESSION);
 	?>

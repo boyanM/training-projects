@@ -18,7 +18,7 @@ def validate(user,psw):
 
 		cursor = connection.cursor()
 		cursor.execute("select password from admins\
-			where (email=%s or username = %s);",(user,user))
+			where username = %s;",(user,))
 		search = cursor.fetchone()
 
 		if search == None:
@@ -52,17 +52,16 @@ def loginHTML(user):
 <body>
 <div>
 <h2>Admin Panel</h2>
-<div id="error"><p>
-Invalid Username or Password
-</p></div>
-<form action="login.py" method="post">
+<div id="error">
+<p>Invalid Username</p></div>
+<form action="admin.py" method="post">
   <div class="container">
     <label for="uname"><b>Username or E-mail</b></label>
     <input type="text" placeholder="Enter Username" name="uname" value="%s" required>
 
     <label for="psw"><b>Password</b></label>
     <input type="password" placeholder="Enter Password" name="psw" required>
-    <button type="submit" onclick="login.py">Login</button>
+    <button type="submit" onclick="admin.py">Login</button>
    </div>
 </form>
 </body>
@@ -79,10 +78,8 @@ password = form.getvalue('psw')
 result = validate(user,password)
 
 if result == True:
-		
-
 	print("Content-type:text/html\r\n\r\n")
-	redirectURL = "http://test.com/cgi-bin/search.py"
+	redirectURL = "http://test.com/search.php"
 
 	print('<html>')
 	print('<head>')
