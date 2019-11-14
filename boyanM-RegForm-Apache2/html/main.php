@@ -1,21 +1,20 @@
 <?php
 	session_start();
 
-	if(isset($_SESSION['active']) && $_SERVER['REQUEST_TIME'] - $_SESSION['active'] < 60){
+	if(isset($_SESSION['active']) && $_SERVER['REQUEST_TIME'] - $_SESSION['active'] < $_SESSION['user_timeout']){
 
 		$user = $_SESSION['user'];
 		$login = $_SESSION['login'];
+		$timeout = $_SESSION['user_timeout'];
 		
 		session_unset();
 		session_destroy();
 		session_start();
 
-		$result = $_SERVER['REQUEST_TIME'] - $_SESSION['active'];
-		
-		$_SESSION["user"] = $user;
-		$_SESSION["login"] = $login;
-		$_SESSION["active"] = $_SERVER['REQUEST_TIME'];
-
+		$_SESSION['user'] = $user;
+		$_SESSION['login'] = $login;
+		$_SESSION['active'] = $_SERVER['REQUEST_TIME'];
+		$_SESSION['user_timeout'] = $timeout;
 	}
 
 	else{
@@ -24,11 +23,10 @@
 		header("Location: http://test.com/login.html");
 	}
 
-
-	
 	print_r($_SESSION);
 	
 ?>
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -40,7 +38,7 @@
 	<ul>
 	  <li><a class="active" href="#home">Home</a></li>
 	  <li>
-	  	<a href="http://test.com/php/check.php?goto=cgi-bin/accfill.py?acc=<?php echo $_SESSION['user'] ?>">Account</a>
+	  	<a href="http://test.com/php/check.php?goto=account.php">Account</a>
 	  </li>
 	  <li><a href="#contact">Contact</a></li>
 	  <li><a href="#about">About</a></li>

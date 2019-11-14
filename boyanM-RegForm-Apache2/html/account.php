@@ -1,5 +1,75 @@
 <?php
+
 	session_start();
+		if(isset($_SESSION['active']) && $_SERVER['REQUEST_TIME'] - $_SESSION['active'] < $_SESSION['user_timeout']){
+
+		$user = $_SESSION['user'];
+		$login = $_SESSION['login'];
+		$timeout = $_SESSION['user_timeout'];
+		
+		session_unset();
+		session_destroy();
+		session_start();
+
+		$_SESSION["active"] = $_SERVER['REQUEST_TIME'];
+
+		$_SESSION["user"] = $user;
+		$_SESSION["login"] = $login;
+		$_SESSION['user_timeout'] = $timeout;
+	}
+
+	else{
+		session_unset();
+		session_destroy();
+		header("Location: http://test.com/login.html");
+	}
+
+
+	$dbconn = pg_connect("host=localhost dbname=wordpress user=wpuser password=password")or die('Could not connect: ' . pg_last_error());
+			$query = "select c.username,c.email,co.country,c.phone from customers c join countries co on(c.country_id = co.id and c.username='$_SESSION[user]');";
+			$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+			$result = pg_fetch_assoc($result);
+	
+	if(isset($_POST["username"]) && $_POST["username"] != $result['username']){
+		$new_user = pg_escape_string($_POST["username"]);
+		$update = "update customers set username='$new_user'
+		 where username = '$result[username]';";
+		pg_query($dbconn,$update) or die('Query failed: ' . pg_last_error());
+    	$_SESSION['user'] = $new_user; 
+	}
+
+/*
+	if(isset($_POST["psw"]) && isset($_POST["psw_repeat"])
+	 && $_POST["psw"]==$_POST["psw_repeat"]){
+		$new_psw = $_POST["psw"];
+*/
+	if(isset($_POST["mail"]) && $_POST["mail"] != $result['email']){
+		$new_mail = pg_escape_string($_POST["mail"]);
+		$update = "update customers set email='$new_mail'
+		where email = '$result[email]';";
+		pg_query($dbconn,$update) or die('Query failed: ' . pg_last_error());
+
+
+	}
+
+	if(isset($_POST["country"]) && $_POST["country"] != $result['country'] ){
+		$new_country = pg_escape_string($_POST["country"]);
+		$update = "update customers set country_id=(select id from countries where country='$new_country') where username = '$_SESSION[user]';";
+		pg_query($dbconn,$update) or die('Query failed: ' . pg_last_error());
+
+	}
+
+	if(isset($_POST["phone"]) && $_POST["phone"] != $result['phone'] ){
+		$new_phone = pg_escape_string($_POST["phone"]);
+		$update = "update customers set phone ='$new_phone' where username = '$_SESSION[user]';";
+		pg_query($dbconn,$update) or die('Query failed: ' . pg_last_error());
+	}
+
+	$query = "select c.username,c.email,co.country,c.phone from customers c join countries co on(c.country_id = co.id and c.username='$_SESSION[user]');";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$result = pg_fetch_assoc($result);
+	print_r($_SESSION)
+
 ?>
 
 <!DOCTYPE html>
@@ -29,9 +99,9 @@
 	<hr>
 	
 		<form name="edit_acc" method="POST"
-		 action="http://test.com/cgi-bin/accfill.py?acc=%s">
+		 action="http://test.com/account.php">
 			<label>Username</label>
-			<input type="text" class="acc_field" name="username" value=%s disabled required>
+			<input type="text" class="acc_field" name="username" value='<?php echo $result['username'] ?>' disabled required>
 			
 			<label>Password</label>
 			<input type="password" class="acc_field" id="psw" name="psw" disabled>
@@ -48,18 +118,17 @@
 			<input type="password" class="acc_field" id="psw_repeat" name="psw_repeat" disabled>
 	
 			<label>E-mail</label>
-			<input type="text" class="acc_field" name="mail" value=%s disabled required>
+			<input type="text" class="acc_field" name="mail"
+			value='<?php echo $result['email'] ?>' disabled required>
 			
 			<label for="Country">Country</label>
-	  		<input type="text" onkeyup="showHint(this.value)" value=%s name="country"
-	  		 id="txtHint" class="acc_field" list="countries" disabled required>
-	
-			<label for="address">Address</label>
-	  		<input type="text" onkeyup="hint(this.value)" name="address"
-	  		 id="ekatteHint" class="acc_field" list="ekatte" value=%s disabled required>
+	  		<input type="text" onkeyup="showHint(this.value)" name="country"
+	  		 id="txtHint" class="acc_field" list="countries"
+	  		 value='<?php echo $result['country'] ?>' disabled required>
 	
 			<label>Phone</label>
-			<input type="text" class="acc_field" name="phone" value=%s disabled required>
+			<input type="text" class="acc_field" name="phone" 
+			value='<?php echo $result['phone'] ?>' disabled required>
 		<hr>
 	
 	<button type="button" id="edit" onclick="editAcc()">Edit profile</button>
