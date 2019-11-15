@@ -9,12 +9,18 @@ if(!isset($_SESSION['login']) && !isset($_SESSION['admin']) && $_SESSION['admin'
 
 print_r($_SESSION);
 
-$dbconn = pg_connect("host=localhost dbname=wordpress user=wp_read password=1111")or die('Could not connect: ' . pg_last_error());
+$dbconn = pg_connect("host=localhost dbname=wordpress user=wpuser password=password")or die('Could not connect: ' . pg_last_error());
 
-$query = "select cu.*,c.country from customers cu join countries c on(cu.country_id=c.id);";
+if(isset($_GET['del'])){
+	$delete = "update customers set inactive=true where id=$_GET[del];";
+	pg_query($dbconn,$delete) or die('Query failed: ' . pg_last_error());
+	header("Location: http://test.com/useracc.php");
+}
 
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-$result = pg_fetch_assoc($result);
+$query = "select cu.id,cu.email,cu.username,cu.inactive,cu.country_id,c.country from customers cu join countries c on(cu.country_id=c.id);";
+
+$result = pg_query($dbconn,$query) or die('Query failed: ' . pg_last_error());
+$col_name = pg_fetch_assoc($result);
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +33,7 @@ $result = pg_fetch_assoc($result);
 	</head>
 	<body>
 		<ul>
-		  <li><a class="active"
+		  <li><a
 		   href="http://test.com/useracc.php">User Accounts</a></li>
 		  <li>
 		  	<a href="http://test.com/php/check.php?goto=account.php">Password Configuration</a>
@@ -37,24 +43,50 @@ $result = pg_fetch_assoc($result);
 		</ul>
 		
 		<div class="user_accounts">
-			<?php
-			echo "<table>
-			 <tr>";
+<?php
+		echo "<table>
+		<tr>";
 
-				for($i = 0; $i < count(array_keys($result));$i++){
-						$key = array_keys($result)[$i];
-						echo "<th>$key</th>";
-				}
-						 	
-			echo "</tr>";
-
-			foreach ($result as $key => $value) {
-				echo $value;
+		for($i = 0; $i < count(array_keys($col_name));$i++){
+			$key = array_keys($col_name)[$i];
+			echo "<th>$key</th>";
+		}
+		echo "<th>Action</th>";			 	
+		echo "</tr>";
+		
+		echo"<tr>";
+		if($col_name['inactive'] == 'f'){
+			foreach ($col_name as $key => $value) {
+					echo "<td>$value</td>";
 			}
-			print_r($result);
-			echo"
-			</table>";
-			?>
+			echo"<td>
+					<a href=\"useracc.php?del=$col_name[id]\" class=\"del_btn\">Delete</a>
+					<a href=\"edituser.php?edit=$col_name[id]\" class=\"edit_btn\">Edit</a>
+				</td>";
+			echo "</tr>";
+		}
+
+		while($row = pg_fetch_assoc($result)){
+			
+			echo "<tr>";
+			foreach ($row as $key => $value) {
+				if($row['inactive'] == 'f'){
+					echo "<td>$value</td>";
+					if($key == 'country'){
+					echo"<td>
+							<a href=\"useracc.php?del=$row[id]\" class=\"del_btn\">Delete</a>
+							<a href=\"edituser.php?edit=$row[id]\"; class=\"edit_btn\" >Edit</a>
+				
+						</td>";
+					}
+				}
+			}
+
+			echo "</tr>";
+		}
+		echo"</table>";
+		pg_close($dbconn);
+?>
 		</div>	
 
 

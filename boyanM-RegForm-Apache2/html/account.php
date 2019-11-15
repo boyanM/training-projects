@@ -68,6 +68,7 @@
 	$query = "select c.username,c.email,co.country,c.phone from customers c join countries co on(c.country_id = co.id and c.username='$_SESSION[user]');";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 	$result = pg_fetch_assoc($result);
+	pg_close($dbconn);
 	print_r($_SESSION)
 
 ?>

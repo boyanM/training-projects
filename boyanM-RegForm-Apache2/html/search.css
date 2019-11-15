@@ -33,7 +33,7 @@ li a:hover:not(.active) {
 
 /*=========================================*/
 
-div.user_accounts{
+.user_accounts{
   margin-top: 10px;
 }
 
@@ -42,19 +42,39 @@ div.user_accounts > * {
   box-sizing: border-box;
 }
 
-div.user_accounts > table {
+table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
-  background-color: white;
 }
 
-div.user_accounts > td, th {
+td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
 }
 
-div.user_accounts > tr:nth-child(even) {
+tr:nth-child(even) {
   background-color: #dddddd;
+}
+
+input{
+  margin-top: 3px;
+}
+
+.del_btn {
+    text-decoration: none;
+    padding: 2px 5px;
+    color: white;
+    border-radius: 3px;
+    background: #800000;
+}
+
+.edit_btn {
+    clear:both;
+    text-decoration: none;
+    padding: 2px 5px;
+    background: #2E8B57;
+    color: white;
+    border-radius: 3px;
 }
