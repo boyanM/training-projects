@@ -78,3 +78,26 @@ input{
     color: white;
     border-radius: 3px;
 }
+
+.add_btn {
+    clear:both;
+    text-decoration: none;
+    padding: 2px 5px;
+    background: #00008B;
+    color: white;
+    border-radius: 3px;
+}
+
+#error{
+  background: #ff8080;
+  border-radius: 25px;
+  padding:3px;
+  margin-bottom: 10px;
+}
+
+#succesful_save{
+  background: #4CAF50;
+  border-radius: 25px;
+  padding:3px;
+  margin-bottom: 10px;
+}

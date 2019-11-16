@@ -8,6 +8,6 @@ $_SESSION["login"] = True;
 $_SESSION["admin"] = True;
 
 
-header("Location: http://test.com/search.php");
+header("Location: http://test.com/useracc.php");
 
 ?>

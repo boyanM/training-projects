@@ -17,7 +17,7 @@ if(isset($_GET['del'])){
 	header("Location: http://test.com/useracc.php");
 }
 
-$query = "select cu.id,cu.email,cu.username,cu.inactive,cu.country_id,c.country from customers cu join countries c on(cu.country_id=c.id);";
+$query = "select cu.id,cu.email,cu.username,cu.inactive,cu.country_id,c.country from customers cu join countries c on(cu.country_id=c.id) order by id;";
 
 $result = pg_query($dbconn,$query) or die('Query failed: ' . pg_last_error());
 $col_name = pg_fetch_assoc($result);
@@ -34,15 +34,17 @@ $col_name = pg_fetch_assoc($result);
 	<body>
 		<ul>
 		  <li><a
-		   href="http://test.com/useracc.php">User Accounts</a></li>
+		   href="http://test.com/useracc.php" class="active">User Accounts</a></li>
 		  <li>
-		  	<a href="http://test.com/php/check.php?goto=account.php">Password Configuration</a>
+		  	<a href="">Password Configuration</a>
 		  </li>
 		  <li><a href="#contact">User Timeout</a></li>
-		  <li><a href="#about">To Be Continued...</a></li>
 		</ul>
+
 		
-		<div class="user_accounts">
+<div class="user_accounts">
+<a href="http://test.com/createuser.php" class="add_btn">+</a>		
+
 <?php
 		echo "<table>
 		<tr>";
