@@ -92,7 +92,7 @@ if(validation):
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="http://test.com/login.css">
+		<link rel="stylesheet" type="text/css" href="https://test.com/login.css">
 	</head>
 	<body>
 		<div id="wrapper">
@@ -120,11 +120,11 @@ if validation is False:
 <head>
 <meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="http://test.com/login.css">
+<link rel="stylesheet" type="text/css" href="https://test.com/login.css">
 </head>
 <body>
 <div id="wrapper">
-<form name="reg_form" method = "POST" action="http://test.com/cgi-bin/admin_reg_form.py">
+<form name="reg_form" method = "POST" action="https://test.com/cgi-bin/admin_reg_form.py">
   <div class="container">
     <h1>Register</h1>
     <div id="error">%s</div>

@@ -79,7 +79,7 @@ result = validate(user,password)
 
 if result == True:
 	print("Content-type:text/html\r\n\r\n")
-	redirectURL = "http://test.com/php/startAdminSess.php?user=%s"%(user)
+	redirectURL = "https://test.com/php/startAdminSess.php?user=%s"%(user)
 
 	print('<html>')
 	print('<head>')

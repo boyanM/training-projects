@@ -1,7 +1,8 @@
 <?php
-$text = "";
+header("Refresh:10; url=https://test.com/php/logout.php");
 
-$text .= "asd";
+echo "Hello world";
 
-echo $text;
+header("Refresh:5; url=https://test.com/php/startSession.php");
+
 ?>

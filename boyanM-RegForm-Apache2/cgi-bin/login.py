@@ -168,7 +168,7 @@ else:
 		
 
 		print("Content-type:text/html\r\n\r\n")
-		redirectURL = "http://test.com/php/startSession.php?user=%s"%user
+		redirectURL = "https://test.com/php/startSession.php?user=%s"%user
 
 		print('<html>')
 		print('<head>')
@@ -179,15 +179,15 @@ else:
 	elif result == -1 and wait != True:
 		plusSign = user.find('+')
 		if plusSign != -1:
-			link = "http://test.com/change.py?email="+ user[:plusSign] + "%2B" + user[plusSign+1:]
+			link = "https://test.com/change.py?email="+ user[:plusSign] + "%2B" + user[plusSign+1:]
 		else:
-			link = "http://test.com/change.py?email=" + user
+			link = "https://test.com/change.py?email=" + user
 		print("""Content-type:text/html\r\n\r\n
 	<html lang="bg">
 	<head>
 	<meta charset=utf-8>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="http://test.com/login.css">
+	<link rel="stylesheet" type="text/css" href="https://test.com/login.css">
 	
 	</head>
 	<body>

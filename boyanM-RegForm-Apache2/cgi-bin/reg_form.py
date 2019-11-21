@@ -54,7 +54,7 @@ def newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
 		return True
 
 	except(Exception,psycopg2.IntegrityError) as err:
-		return False
+		return err
 		
 	except(Exception,psycopg2.Error) as error:
 		print("Error while connecting to PostgreSQL:",error)
@@ -195,7 +195,6 @@ checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
 
 if match == None: 
 	check[0] = False
-	
 
 if not lengthCheck(user,30):
 	check[4] = False
@@ -258,12 +257,11 @@ validation = True
 for i in check:
 	if i is False:
 		validation = False
-
+add = ""
 if(validation):
 
 	key = generateKey()
 	add = newCustomer(email,user,psw,name,lname,bday,gender,phone,address,key,country)
-
 	if add is True:
 		plusSign = email.find('+')
 		if plusSign != -1:
@@ -276,7 +274,7 @@ if(validation):
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="http://test.com/reg_form.css">
+		<link rel="stylesheet" type="text/css" href="https://test.com/reg_form.css">
 	</head>
 	<body>
 		<div id="wrapper">
@@ -304,7 +302,7 @@ if validation is False:
 <head>
 <meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="http://test.com/style.css">
+<link rel="stylesheet" type="text/css" href="https://test.com/style.css">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <!-- Calendar -->
@@ -315,13 +313,14 @@ if validation is False:
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <!-- Search in DB -->
-<script type="text/javascript" src="http://test.com/js/showhint.js"></script>
+<script type="text/javascript" src="https://test.com/js/showhint.js"></script>
 
 
 </head>
 <body>
+%s
 <div id="wrapper">
-<form name="reg_form" method = "POST" action="http://test.com/cgi-bin/reg_form.py">
+<form name="reg_form" method = "POST" action="https://test.com/cgi-bin/reg_form.py">
   <div class="container">
     <h1>Register</h1>
     <div id="error">%s</div>
@@ -345,7 +344,7 @@ if validation is False:
 
   <label for="last-name"><b>Last name</b></label>
   <input type="text" placeholder="Enter Last name" name="lname" value="%s" required>
-"""%(error,email,user,name,lname))
+"""%(add,error,email,user,name,lname))
 	if(gender == "m"):
 		print("""<label for="gender"><b>Gender</b></label><br>
 	  <input type="radio" name="gender" value="male" checked="checked"> Male
@@ -429,7 +428,7 @@ if validation is False:
   </div>
   
   <div class="container signin">
-    <p>Already have an account? <a href="http://test.com/login.html">Login</a>.</p>
+    <p>Already have an account? <a href="https://test.com/login.html">Login</a>.</p>
   </div>
 </form>
 </div>

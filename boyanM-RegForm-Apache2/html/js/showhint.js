@@ -9,7 +9,7 @@ function showHint(str) {
         document.getElementById("txtHint").innerHTML = this.responseText;
       }
     };
-    xmlhttp.open("GET", "http://test.com/cgi-bin/showhint.py?q=" + str, true);
+    xmlhttp.open("GET", "https://test.com/cgi-bin/showhint.py?q=" + str, true);
     xmlhttp.send();
   }
 }
@@ -48,7 +48,7 @@ function hint(str) {
           
         }
       };
-      xmlhttp.open("GET", "http://test.com/php/showEkatte.php?q=" + str, true);
+      xmlhttp.open("GET", "https://test.com/php/showEkatte.php?q=" + str, true);
       xmlhttp.send();
     }
   }

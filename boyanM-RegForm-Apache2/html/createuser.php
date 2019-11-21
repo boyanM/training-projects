@@ -5,7 +5,7 @@
 	 && !isset($_GET['edit'])){
 		session_unset();
 		session_destroy();
-		header("Location: http://test.com/admin.html");
+		header("Location: https://test.com/admin.html");
 	}
 
 	$dbconn = pg_connect("host=localhost dbname=wordpress user=wpuser password=password")or die('Could not connect: ' . pg_last_error());
@@ -27,9 +27,8 @@
 		 	$check = pg_query($dbconn,$insert);
 		  	if(!$check){
 		  		throw new Exception("Error while updating the database");
-		  			
-		  	}
-		  }
+			  }
+			}
 
 			catch(Exception $e){
 			$error = "Wrong filled fields !";
@@ -37,7 +36,7 @@
 			}
 
 			if(!(isset($error))){
-			header("Location: http://test.com/useracc.php");
+			header("Location: https://test.com/useracc.php");
 			}
 		}
 
@@ -49,10 +48,10 @@
 <head>
 	<meta charset=utf-8>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="http://test.com/search.css">
+	<link rel="stylesheet" type="text/css" href="https://test.com/search.css">
 </head>
 <body>
-<a href="http://test.com/useracc.php" class="add_btn">GO BACK</a>
+<a href="https://test.com/useracc.php" class="add_btn">GO BACK</a>
 <?php
 		if(isset($error)){
 			echo "<div id=\"error\">
@@ -60,7 +59,7 @@
 			</div>";
 		}
 ?>	
-	<form name="new_user" method="POST" action="http://test.com/createuser.php">
+	<form name="new_user" method="POST" action="https://test.com/createuser.php">
 
 				<label for="email"><b>E-mail</b></label>
 				<input type="text" name="email" required>

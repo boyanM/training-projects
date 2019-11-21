@@ -18,6 +18,6 @@ $_SESSION['user_timeout'] = $result;
 
 print_r($_SESSION);
 
-header("Location: http://test.com/main.php");
+header("Location: https://test.com/main.php");
 
 ?>

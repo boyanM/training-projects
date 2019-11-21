@@ -4,7 +4,7 @@ session_start();
 if(!isset($_SESSION['login']) && !isset($_SESSION['admin']) && $_SESSION['admin'] != True){
 	session_unset();
 	session_destroy();
-	header("Location: http://test.com/admin.html");
+	header("Location: https://test.com/admin.html");
 }
 
 print_r($_SESSION);
@@ -14,7 +14,7 @@ $dbconn = pg_connect("host=localhost dbname=wordpress user=wpuser password=passw
 if(isset($_GET['del'])){
 	$delete = "update customers set inactive=true where id=$_GET[del];";
 	pg_query($dbconn,$delete) or die('Query failed: ' . pg_last_error());
-	header("Location: http://test.com/useracc.php");
+	header("Location: https://test.com/useracc.php");
 }
 
 $query = "select cu.id,cu.email,cu.username,cu.inactive,cu.country_id,c.country from customers cu join countries c on(cu.country_id=c.id) order by id;";
@@ -29,21 +29,21 @@ $col_name = pg_fetch_assoc($result);
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="http://test.com/search.css">
+		<link rel="stylesheet" type="text/css" href="https://test.com/search.css">
 	</head>
 	<body>
 		<ul>
 		  <li><a
-		   href="http://test.com/useracc.php" class="active">User Accounts</a></li>
+		   href="https://test.com/useracc.php" class="active">User Accounts</a></li>
 		  <li>
-		  	<a href="">Password Configuration</a>
+		  	<a href="https://test.com/pass_conf.php">Password Configuration</a>
 		  </li>
-		  <li><a href="#contact">User Timeout</a></li>
+		  <li><a href="https://test.com/timeout_conf.php">Timeout Configuration</a></li>
 		</ul>
 
 		
 <div class="user_accounts">
-<a href="http://test.com/createuser.php" class="add_btn">+</a>		
+<a href="https://test.com/createuser.php" class="add_btn">+</a>		
 
 <?php
 		echo "<table>

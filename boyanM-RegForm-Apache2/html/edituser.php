@@ -5,7 +5,7 @@
 	 && !isset($_GET['edit'])){
 		session_unset();
 		session_destroy();
-		header("Location: http://test.com/admin.html");
+		header("Location: https://test.com/admin.html");
 	}
 
 
@@ -62,7 +62,7 @@
 <head>
 <meta charset=utf-8>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="http://test.com/search.css">
+<link rel="stylesheet" type="text/css" href="https://test.com/search.css">
 </head>
 <body>
 	
@@ -78,11 +78,11 @@
 			</div>";
 		}
 ?>			
-<a href="http://test.com/useracc.php" class="add_btn">GO BACK</a>
+<a href="https://test.com/useracc.php" class="add_btn">GO BACK</a>
 <?php
 	echo "<br><br>
 	<form name=\"edit_form\" method=\"POST\"
-	 action=\"http://test.com/edituser.php?edit=$_GET[edit]\">";
+	 action=\"https://test.com/edituser.php?edit=$_GET[edit]\">";
 	$counter=0;
 	while($row = pg_fetch_assoc($result)){
 		foreach ($row as $key => $value) {

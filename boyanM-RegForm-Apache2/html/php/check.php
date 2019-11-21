@@ -1,7 +1,7 @@
 <?php
 	session_start();
 		if(!(isset($_SESSION['login']))){
-			header("Location: http://test.com/login.html");
+			header("Location: https://test.com/login.html");
 		}
 
 		else{
@@ -10,13 +10,13 @@
 
 				$goto = $_GET['goto'];
 				$_SESSION["active"] = $_SERVER['REQUEST_TIME'];
-				header("Location: http://test.com/$goto");
+				header("Location: https://test.com/$goto");
 			}
 			
 			else{
 				session_unset();
 				session_destroy();
-				header("Location: http://test.com/login.html");
+				header("Location: https://test.com/login.html");
 			}
 	}
 	
