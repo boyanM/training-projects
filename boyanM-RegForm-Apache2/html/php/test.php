@@ -1,8 +1,5 @@
 <?php
-header("Refresh:10; url=https://test.com/php/logout.php");
 
-echo "Hello world";
-
-header("Refresh:5; url=https://test.com/php/startSession.php");
+echo date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']+60);
 
 ?>

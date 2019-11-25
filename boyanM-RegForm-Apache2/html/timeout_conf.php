@@ -13,12 +13,13 @@ $dbconn = pg_connect("host=localhost dbname=wordpress user=wpuser password=passw
 
 if(!empty($_POST)){
 		$update="update pass_auth set 
-		 user_timeout=$_POST[timer1]";
+		 user_timeout=$_POST[timer1],
+		 auto_logout=$_POST[timer2]";
 
 		$check = pg_query($dbconn,$update);
 }
 
-$query = "select user_timeout from pass_auth;";
+$query = "select user_timeout,auto_logout from pass_auth;";
 
 $result = pg_query($dbconn,$query) or die('Query failed: ' . pg_last_error());
 $table = pg_fetch_assoc($result);
@@ -67,7 +68,10 @@ $table = pg_fetch_assoc($result);
 		<div>
 			<form name="timers" method="POST" action="https://test.com/timeout_conf.php">
 				<label for="timer1"><b>User Timeout Time: </b></label>
-				<input type="number" name="timer1" value="<?php echo $table['user_timeout'];?>" required>
+				<input type="number" name="timer1" value="<?php echo $table['user_timeout'];?>" required><br>
+
+				<label for="timer1"><b>Auto-Logout Time: </b></label>
+				<input type="number" name="timer2" value="<?php echo $table['auto_logout'];?>" required>
 
 				<br><br> <button type="submit" class="del_btn">Save</button>
 		</div>

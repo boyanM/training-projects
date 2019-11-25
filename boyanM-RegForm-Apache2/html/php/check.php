@@ -6,7 +6,7 @@
 
 		else{
 			
-			if(isset($_SESSION['active']) && $_SERVER['REQUEST_TIME'] - $_SESSION['active'] <$_SESSION['user_timeout']) {
+			if(isset($_SESSION['active']) && $_SERVER['REQUEST_TIME'] - $_SESSION['active'] <$_SESSION['user_timeout'] && $_SERVER['REQUEST_TIME'] < $_SESSION['auto_logout'])  {
 
 				$goto = $_GET['goto'];
 				$_SESSION["active"] = $_SERVER['REQUEST_TIME'];
