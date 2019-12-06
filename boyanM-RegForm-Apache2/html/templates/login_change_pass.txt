@@ -1,0 +1,25 @@
+	<html lang="bg">
+	<head>
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="https://test.com/login.css">
+	
+	</head>
+	<body>
+	<h2>Choose new password</h2>
+	<form action="${link | h}" method="post">
+	  <div class="container">
+	    <label for="pass"><b>Password</b></label>
+	    <input type="password" placeholder="Enter Password" name="pass" required>
+	
+	    <label for="pass_rep"><b> Repeat Password</b></label>
+	    <input type="password" placeholder="Enter Password" name="pass_rep" required>
+	
+	    <button type="submit">Send me e-mail</button>
+	  </div>
+	  <div class="container" style="background-color:#f1f1f1">
+	    <a class = "acc" href="../index.html">Create account</a></span>
+	  </div>
+	</form>
+	</body>
+	</html>

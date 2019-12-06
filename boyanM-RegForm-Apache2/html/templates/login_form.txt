@@ -1,0 +1,30 @@
+<html lang="bg">
+<head>
+<meta charset=utf-8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="../login.css">
+
+</head>
+<body>
+<div>
+<h2>Login Form</h2>
+<div id="error"><p>
+Invalid Username or Password
+</p></div>
+<form action="login.py" method="post">
+  <div class="container">
+    <label for="uname"><b>Username or E-mail</b></label>
+    <input type="text" placeholder="Enter Username" name="uname" value="${user | h}" required>
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" required>
+    <button type="submit" onclick="login.py">Login</button>
+   </div>
+	<div class="container" style="background-color:#f1f1f1">
+    <a class = "acc" href="../index.html">Create account</a></span>
+    <a class = "psw" href="../resetpass.html">Forgot password?</a></span>
+  </div>
+</form>
+
+</body>
+</html>

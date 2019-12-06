@@ -12,6 +12,7 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+from mako.template import Template
 
 def reCAPTCHA(g_response):
 	url = 'https://www.google.com/recaptcha/api/siteverify'
@@ -148,7 +149,7 @@ def sendMail(email,key):
 	    )
 
 
-
+#----------------------------------------------------------------------------
 form = cgi.FieldStorage()
 
 email = form.getvalue('email')
@@ -182,70 +183,54 @@ g_response = form.getvalue('g-recaptcha-response')
 
 country = form.getvalue('Country')
 
-check = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
-checkIndexMeanings=["Invalid e-mail","E-mail or username already in use"
-,"The username already exists. Please use a different username",
-"Password and Repeat Password don't match", "Username cannot be longer than 30 characters",
-"First name cannot be longer than 30 characters","Invalid date",
-"Invalid phone number","Address cannot be longer than 30 characters",
-"Last name cannot be longer than 30 characters","Password must be at least 8 characters long",
-"Password must contain at least 1 Capital Letter",
-"Password must contain at least 1 Small-Case Letter","Password must contain letters",
-"Please check out the reCAPTCHA","Password cannot contain the username"]
-
+error = []
 if match == None: 
-	check[0] = False
+	error.append("Invalid e-mail")
 
 if not lengthCheck(user,30):
-	check[4] = False
+	error.append("Username cannot be longer than 30 characters")
 
 if not lengthCheck(name,30):
-	check[5] = False
-
+	error.append("Username cannot be longer than 30 characters")
+	
 if not validateDate(bday):
-	check[6] = False
-
+	error.append("Invalid date")
 
 if not lengthCheck(address,30):
-	check[8] = False
+	error.append("Address cannot be longer than 30 characters")
 
 if not lengthCheck(lname,30):
-	check[9] = False	
+	error.append("Last name cannot be longer than 30 characters")
 
 if not validatePhone(tel1,tel2,tel3):
-	check[7] = False
-
+	error.append("Invalid phone number")
 
 if len(psw) < 8:
-	check[10] = False
+	error.append("Password must be at least 8 characters long")
 
 else:
 	if psw != conf_psw:
-		check[3] = False
+		error.append("Password and Repeat Password don't match")
 
 	else:
 		if psw.find(user) != -1:
-			check[15] = False
+			error.append("Password cannot contain the username")
 		else:	
 			if not psw.upper().isupper():
-				check[13] = False
+				error.append("Password must contain letters")
 			else:
 				if psw.islower():
-					check[11] = False
+					error.append("Password must contain at least 1 Capital Letter")
 
 				if psw.isupper():
-					check[12] = False	
-
-			 
+					error.append("Password must contain at least 1 Small-Case Letter")
 
 if g_response == None:
-	check[14] = False
+		error.append("Please check out the reCAPTCHA")
 
 else:	
 	if reCAPTCHA(g_response) is False:
-		check[14] = False
-
-
+		error.append("Please check out the reCAPTCHA")
 
 if gender == 'male':
 	gender = 'm'
@@ -254,8 +239,7 @@ else:
 
 
 validation = True
-for i in check:
-	if i is False:
+if len(error) != 0:
 		validation = False
 add = ""
 if(validation):
@@ -270,168 +254,21 @@ if(validation):
 		else:
 			sendMail(email,key)
 
-		print("""Content-type:text/html\r\n\r\n
-<html>
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="https://test.com/reg_form.css">
-	</head>
-	<body>
-		<div id="wrapper">
-			<div class="container">
-				<h1>Successful Registration</h1>
-				<p>One last step to activate your profile is to verify your email address</p>
-			</div>
-		</div>
-	</body>
-</html>""")
+		mytemplate = Template(filename='/var/www/test.com/html/templates/reg_form_suc.txt',
+		 module_directory='/tmp/mako_modules')
+		print("Content-type:text/html\r\n\r\n",mytemplate.render())
 
 	else:
 		validation = False
-		check[1] = False
-
+		error.append("E-mail or username already in use")
 
 if validation is False:
-	error = ""
-	for i in range(len(check)):
-		if check[i] is False:
-			error += checkIndexMeanings[i] + "<br>"
-	print("""Content-type:text/html\r\n\r\n
-<html lang="bg">
 
-<head>
-<meta charset=utf-8>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="https://test.com/style.css">
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-<!-- Calendar -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<script type="text/javascript" src="/js/calendar.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-
-<!-- Search in DB -->
-<script type="text/javascript" src="https://test.com/js/showhint.js"></script>
-
-
-</head>
-<body>
-%s
-<div id="wrapper">
-<form name="reg_form" method = "POST" action="https://test.com/cgi-bin/reg_form.py">
-  <div class="container">
-    <h1>Register</h1>
-    <div id="error">%s</div>
-    <p>Please fill in this form to create an account.</p>
-    <hr>
-
-  <label for="email"><b>Email</b></label>
-  <input type="text" placeholder="Enter Email" name="email" value="%s" required>
-
-  <label for="Username"><b>Username</b></label>
-  <input type="text" placeholder="Enter Username" name="user" value="%s" required>
-
-  <label for="psw"><b>Password</b></label>
-  <input type="password" placeholder="Enter Password" name="psw" required>
-
-  <label for="psw-repeat"><b>Repeat Password</b></label>
-  <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
-
-  <label for="first-name"><b>First name</b></label>
-  <input type="text" placeholder="Enter First name" name="name" value="%s" required>
-
-  <label for="last-name"><b>Last name</b></label>
-  <input type="text" placeholder="Enter Last name" name="lname" value="%s" required>
-"""%(add,error,email,user,name,lname))
-	if(gender == "m"):
-		print("""<label for="gender"><b>Gender</b></label><br>
-	  <input type="radio" name="gender" value="male" checked="checked"> Male
-	  <input type="radio" name="gender" value="female"> Female<br><br>
-	""")
-	else:	
-		print("""<label for="gender"><b>Gender</b></label><br>
-	  <input type="radio" name="gender" value="male" > Male
-	  <input type="radio" name="gender" value="female" checked="checked"> Female<br><br>
-	""")
-
-	print("""<label for="bday"><b>Birthday date</b></label>
-  <input type="text" name="birthday" value="%s">
-
-  <label for="phone"><b>Phone</b></label><br>
-    <select name="countryCode" style = "width:150px; heigth:10px">
-        <option data-countryCode="GB" value="44" Selected>UK (+44)</option>
-        <option data-countryCode="US" value="1">USA (+1)</option>
-        <option data-countryCode="BG" value="359">BG (+359)</option>
-      <optgroup label="Other countries">
-        <option data-countryCode="DZ" value="213">Algeria (+213)</option>
-        <option data-countryCode="AD" value="376">Andorra (+376)</option>
-        <option data-countryCode="AO" value="244">Angola (+244)</option>
-        <option data-countryCode="AI" value="1264">Anguilla (+1264)</option>
-        <option data-countryCode="AG" value="1268">Antigua &amp; Barbuda (+1268)</option>
-        <option data-countryCode="AR" value="54">Argentina (+54)</option>
-        <option data-countryCode="AM" value="374">Armenia (+374)</option>
-        <option data-countryCode="AW" value="297">Aruba (+297)</option>
-        <option data-countryCode="AU" value="61">Australia (+61)</option>
-        <option data-countryCode="AT" value="43">Austria (+43)</option>
-        <option data-countryCode="AZ" value="994">Azerbaijan (+994)</option>
-        <option data-countryCode="BS" value="1242">Bahamas (+1242)</option>
-        <option data-countryCode="BH" value="973">Bahrain (+973)</option>
-        <option data-countryCode="BD" value="880">Bangladesh (+880)</option>
-        <option data-countryCode="BB" value="1246">Barbados (+1246)</option>
-        <option data-countryCode="BY" value="375">Belarus (+375)</option>
-        <option data-countryCode="BE" value="32">Belgium (+32)</option>
-        <option data-countryCode="BZ" value="501">Belize (+501)</option>
-        <option data-countryCode="BJ" value="229">Benin (+229)</option>
-        <option data-countryCode="BM" value="1441">Bermuda (+1441)</option>
-        <option data-countryCode="BT" value="975">Bhutan (+975)</option>
-        <option data-countryCode="BO" value="591">Bolivia (+591)</option>
-        <option data-countryCode="BA" value="387">Bosnia Herzegovina (+387)</option>
-        <option data-countryCode="BW" value="267">Botswana (+267)</option>
-        <option data-countryCode="BR" value="55">Brazil (+55)</option>
-        <option data-countryCode="BN" value="673">Brunei (+673)</option>
-        <option data-countryCode="BG" value="359">Bulgaria (+359)</option>
-        <option data-countryCode="BF" value="226">Burkina Faso (+226)</option>
-        <option data-countryCode="BI" value="257">Burundi (+257)</option>
-    </optgroup>
-  </select>
-
-  (<input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
-  onKeyPress="if(this.value.length==2) return false;" placeholder="88"
-  value="%s" name="tel1" min="0" required> ) - 
-  <input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
-  onKeyPress="if(this.value.length==3) return false;" placeholder="571"
-  value="%s" name="tel2" min="0" required> -
-  <input type="number" class="tel" pattern="/^-?\\d+\\.?\\d*$/"
-  onKeyPress="if(this.value.length==4) return false;" placeholder="3019"
-  value="%s" name="tel3" min="0" required>
-  <br>
-
-  <label for="Country"><b>Country</b></label>
-  <input type="text" onkeyup="showHint(this.value)"
-   placeholder="Enter Country ex. Bulgaria" name="Country"
-   value="%s" id="txtHint" list="countries" required>
-
-  <label for="address"><b>Address</b></label>
-  <input type="text" onkeyup="hint(this.value)"
-   name="address"
-   id="ekatteHint" list="ekatte" required>
-  <datalist id="ekatte"></datalist>
-
-  <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>
-  
-  <div class="g-recaptcha" data-sitekey="6LclYLoUAAAAAG0FnwojofEbXcmLeE7I3pxv1v51"></div>
-
-    <hr>
-    <button type="submit" class="registerbtn">Register</button>
-  </div>
-  
-  <div class="container signin">
-    <p>Already have an account? <a href="https://test.com/login.html">Login</a>.</p>
-  </div>
-</form>
-</div>
-
-</body>
-</html>"""%(bday,tel1,tel2,tel3,country))
+	mytemplate = Template(filename='/var/www/test.com/html/templates/reg_form_fail.txt',
+		 module_directory='/tmp/mako_modules')
+	print("Content-type:text/html\r\n\r\n",mytemplate.render(
+		add=add,error=error,email=email
+		,user=user,name=name,lname=lname
+		,gender=gender,bday=bday,tel1=tel1
+		,tel2=tel2,tel3=tel3,country=country)
+	)

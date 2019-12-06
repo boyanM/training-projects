@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="https://test.com/main.css">
+</head>
+<body>
+
+	<ul>
+	  <li><a class="active" href="#home">Home</a></li>
+	  <li>
+	  	<a href="https://test.com/php/check.php?goto=account.php">Account</a>
+	  </li>
+	  <li><a href="#contact">Contact</a></li>
+	  <li><a href="https://test.com/php/logout.php">Logout</a></li>
+	  <li class="menu_right"><a href="https://test.com/php/logout.php">Cart</a></li>
+	</ul>
+
+</body>
+</html>

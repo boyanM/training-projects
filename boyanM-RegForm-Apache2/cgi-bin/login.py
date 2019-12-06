@@ -6,6 +6,8 @@ import psycopg2
 import os
 import datetime
 import subprocess
+from mako.template import Template
+
 
 def validate(user,psw):
 	result = False
@@ -100,39 +102,11 @@ def failedLogin(user):
 			return (current_attempt,pass_timers,last_login)
 
 def loginHTML(user):
-	html = """Content-type:text/html\r\n\r\n
-<html lang="bg">
-<head>
-<meta charset=utf-8>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="../login.css">
+		mytemplate = Template(filename='/var/www/test.com/html/templates/login_form.txt',
+		 module_directory='/tmp/mako_modules')
+		print("Content-type:text/html\r\n\r\n",mytemplate.render(user=user))
 
-</head>
-<body>
-<div>
-<h2>Login Form</h2>
-<div id="error"><p>
-Invalid Username or Password
-</p></div>
-<form action="login.py" method="post">
-  <div class="container">
-    <label for="uname"><b>Username or E-mail</b></label>
-    <input type="text" placeholder="Enter Username" name="uname" value="%s" required>
-
-    <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required>
-    <button type="submit" onclick="login.py">Login</button>
-   </div>
-	<div class="container" style="background-color:#f1f1f1">
-    <a class = "acc" href="../index.html">Create account</a></span>
-    <a class = "psw" href="../resetpass.html">Forgot password?</a></span>
-  </div>
-</form>
-
-</body>
-</html>
-	"""%(user)
-	print(html)
+#-------------------------------------------------------------------
 
 form = cgi.FieldStorage()
 
@@ -165,16 +139,9 @@ else:
 	
 	
 	if result == True and wait != True:
-		
-
-		print("Content-type:text/html\r\n\r\n")
-		redirectURL = "https://test.com/php/startSession.php?user=%s"%user
-
-		print('<html>')
-		print('<head>')
-		print('    <meta http-equiv="refresh" content="0;url='+str(redirectURL)+'" />')
-		print('</head>')
-		print('</html>')
+		mytemplate = Template(filename='/var/www/test.com/html/templates/login_suc.txt',
+		 module_directory='/tmp/mako_modules')
+		print("Content-type:text/html\r\n\r\n",mytemplate.render(user=user))
 
 	elif result == -1 and wait != True:
 		plusSign = user.find('+')
@@ -182,107 +149,30 @@ else:
 			link = "https://test.com/change.py?email="+ user[:plusSign] + "%2B" + user[plusSign+1:]
 		else:
 			link = "https://test.com/change.py?email=" + user
-		print("""Content-type:text/html\r\n\r\n
-	<html lang="bg">
-	<head>
-	<meta charset=utf-8>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="https://test.com/login.css">
-	
-	</head>
-	<body>
-	<h2>Choose new password</h2>
-	<form action="%s" method="post">
-	  <div class="container">
-	    <label for="pass"><b>Password</b></label>
-	    <input type="password" placeholder="Enter Password" name="pass" required>
-	
-	    <label for="pass_rep"><b> Repeat Password</b></label>
-	    <input type="password" placeholder="Enter Password" name="pass_rep" required>
-	
-	    <button type="submit">Send me e-mail</button>
-	  </div>
-	  <div class="container" style="background-color:#f1f1f1">
-	    <a class = "acc" href="../index.html">Create account</a></span>
-	  </div>
-	</form>
-	</body>
-	</html>"""%(link))
+		
+		mytemplate = Template(filename='/var/www/test.com/html/templates/login_change_pass.txt',
+		 module_directory='/tmp/mako_modules')
+		print("Content-type:text/html\r\n\r\n",mytemplate.render(link=link))
 	
 	
 	else:
 		if failed_login != None and attempts < time[1]:   
 			if difference_login < time[0]:
-				print("""Content-type:text/html\r\n\r\n
-	<html lang="bg">
-	<head>
-	<meta charset=utf-8>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="../login.css">
-	
-	</head>
-	<body>
-	<div>
-	<h2>Login Form</h2>
-	<div id="error"><p>
-	Invalid Username or Password<br>
-	Wait %s seconds till next attempt
-	</p></div>
-	<form action="login.py" method="post">
-	  <div class="container">
-	    <label for="uname"><b>Username or E-mail</b></label>
-	    <input type="text" placeholder="Enter Username" name="uname" value="%s" required>
-	
-	    <label for="psw"><b>Password</b></label>
-	    <input type="password" placeholder="Enter Password" name="psw" required>
-	    <button type="submit" onclick="login.py">Login</button>
-	   </div>
-		<div class="container" style="background-color:#f1f1f1">
-	    <a class = "acc" href="../index.html">Create account</a></span>
-	    <a class = "psw" href="../resetpass.html">Forgot password?</a></span>
-	  </div>
-	</form>
-	
-	</body>
-	</html>
-	"""%(time[0]-difference_login,user))
+				restrict = time[0] - difference_login
+				mytemplate = Template(filename='/var/www/test.com/html/templates/login_fail.txt',
+		 module_directory='/tmp/mako_modules')
+				print("Content-type:text/html\r\n\r\n",
+					mytemplate.render(restrict=restrict,user=user))
 			else:
 				loginHTML(user)
 	
 		elif failed_login != None and attempts >= time[1]:
 			if difference_login < time[2]:
-				print("""Content-type:text/html\r\n\r\n
-	<html lang="bg">
-	<head>
-	<meta charset=utf-8>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="../login.css">
-	</head>
-	<body>
-	<div>
-	<h2>Login Form</h2>
-	<div id="error"><p>
-	Invalid Username or Password<br>
-	Wait %s seconds till next attempt
-	</p></div>
-	<form action="login.py" method="post">
-	  <div class="container">
-	    <label for="uname"><b>Username or E-mail</b></label>
-	    <input type="text" placeholder="Enter Username" name="uname" value="%s" required>
-	
-	    <label for="psw"><b>Password</b></label>
-	    <input type="password" placeholder="Enter Password" name="psw" required>
-	    <button type="submit" onclick="login.py">Login</button>
-	   </div>
-		<div class="container" style="background-color:#f1f1f1">
-	    <a class = "acc" href="../index.html">Create account</a></span>
-	    <a class = "psw" href="../resetpass.html">Forgot password?</a></span>
-	  </div>
-	</form>
-	
-	</body>
-	</html>
-	"""%(time[2] - difference_login,user))
+				restrict = time[2] - difference_login
+				mytemplate = Template(filename='/var/www/test.com/html/templates/login_fail.txt',
+		 module_directory='/tmp/mako_modules')
+				print("Content-type:text/html\r\n\r\n",
+					mytemplate.render(restrict=restrict,user=user))
 			else:
 				loginHTML(user)
 	
