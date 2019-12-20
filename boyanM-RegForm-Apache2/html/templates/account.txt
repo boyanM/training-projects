@@ -1,0 +1,67 @@
+<html lang="bg">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="https://test.com/main.css">
+	</head>
+	<body>
+	<ul>
+	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}">Home</a></li>
+	  <li>
+	  	<a href="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">Account</a>
+	  </li>
+	  <li><a href="#contact">Contact</a></li>
+	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
+	</ul>
+
+
+	<link rel="stylesheet" type="text/css" href="https://test.com/style1.css">
+	<script type="text/javascript" src="https://test.com/js/editacc.js"></script>
+	<script type="text/javascript" src="https://test.com/js/showhint.js"></script>
+	
+		<p id="open">Welcome to your account</p>
+	<br>
+	<hr>
+	
+		<form name="edit_acc" method="POST"
+		 action="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">
+			<label>Username</label>
+			<input type="text" class="acc_field" name="username" value='${username | h}' disabled required>
+			
+			<label>Password</label>
+			<input type="password" class="acc_field" id="psw" name="psw" disabled>
+			 	
+			 	<div id="message">
+				  <h3>Password must contain the following:</h3>
+				  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+				  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+				  <p id="number" class="invalid">A <b>number</b></p>
+				  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+				</div>
+	
+			<label id="psw_repeat_label">Repeat Password</label>
+			<input type="password" class="acc_field" id="psw_repeat" name="psw_repeat" disabled>
+	
+			<label>E-mail</label>
+			<input type="text" class="acc_field" name="email"
+			value='${email | h}' disabled required>
+			
+	  		<label for="address"><b>Address</b></label>
+  			<input type="text" onkeyup="hint(this.value)" value='${address |h}' name="address" class="acc_field" id="ekatteHint" list="ekatte" disabled required>
+  			<datalist id="ekatte"></datalist>
+
+			<label>Phone</label>
+			<input type="text" class="acc_field" name="phone" 
+			value='${phone | h}' disabled required>
+
+			<label for="Country">Country</label>
+	  		<input type="text" onkeyup="showHint(this.value)" name="country"
+	  		 id="txtHint" class="acc_field" list="countries"
+	  		 value='${country | h}' disabled required>
+		<hr>
+	
+	<button type="button" id="edit" onclick="editAcc()">Edit profile</button>
+	<input type="submit" id="save_btn" value="Save">
+	</form>
+	</body>
+	</html>

@@ -6,12 +6,14 @@ from datetime import datetime
 from datetime import timedelta  
 from callDB import callDB
 
-def createSession(user_id):
+def createSession(user):
 	try:
 		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		timeout = site_db.queryDB('select user_timeout,auto_logout from pass_auth;')
-		user_timeout = datetime.now() + timedelta(seconds=timeout[0][0])
-		auto_logout = datetime.now() + timedelta(seconds=timeout[0][1])
+		timeout = site_db.queryDB('''select c.id,p.user_timeout,p.auto_logout
+		 from customers c,pass_auth p where username=%s''',user)
+		user_id = int(timeout[0][0])
+		user_timeout = datetime.now() + timedelta(seconds=timeout[0][1])
+		auto_logout = datetime.now() + timedelta(seconds=timeout[0][2])
 		
 		user_timeout = user_timeout.strftime("%Y-%m-%d %H:%M:%S")
 		auto_logout = auto_logout.strftime("%Y-%m-%d %H:%M:%S")
@@ -70,5 +72,18 @@ def isValidSession(session_id):
 			return True
 
 	except (Exception,psycopg2.Error) as error:
-		print("Error while checking the session:",error)
 		return False
+
+
+
+def deleteSession(session_id):
+	try:
+		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+		site_db.executeDB("delete from session where id =%s",session_id)
+	
+	except (Exception,psycopg2.Error) as error:
+		print("Error while deleting the session:",error)
+		return False
+		
+	finally:
+		site_db.closeDB()

@@ -118,8 +118,7 @@ ${add | h}
 
   <label for="address"><b>Address</b></label>
   <input type="text" onkeyup="hint(this.value)"
-   name="address"
-   id="ekatteHint" list="ekatte" required>
+   name="address" id="ekatteHint" list="ekatte" required>
   <datalist id="ekatte"></datalist>
 
   <label><input type="checkbox" name="terms" required><b>I agree to <a href="https://en.wikipedia.org/wiki/Terms_of_service">Terms of Service</a></b></label><br><br>

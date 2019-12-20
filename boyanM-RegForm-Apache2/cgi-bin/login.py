@@ -7,6 +7,7 @@ import os
 import datetime
 import subprocess
 from mako.template import Template
+import session
 
 
 def validate(user,psw):
@@ -139,9 +140,15 @@ else:
 	
 	
 	if result == True and wait != True:
-		mytemplate = Template(filename='/var/www/test.com/html/templates/login_suc.txt',
+		
+		session_id = session.createSession(user)
+		if session_id != False:
+			mytemplate = Template(filename='/var/www/test.com/html/templates/login_suc.txt',
 		 module_directory='/tmp/mako_modules')
-		print("Content-type:text/html\r\n\r\n",mytemplate.render(user=user))
+			print("Content-type:text/html\r\n\r\n",mytemplate.render(session_id=session_id))	
+		
+		else:
+			loginHTML(user)
 
 	elif result == -1 and wait != True:
 		plusSign = user.find('+')
