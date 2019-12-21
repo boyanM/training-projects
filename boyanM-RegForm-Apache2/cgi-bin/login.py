@@ -90,6 +90,7 @@ def failedLogin(user):
 			where username=%s or email=%s",(counter,'now()',user,user))
 			connection.commit()
 			current_attempt = counter
+
 		
 		
 
@@ -145,7 +146,8 @@ else:
 		if session_id != False:
 			mytemplate = Template(filename='/var/www/test.com/html/templates/login_suc.txt',
 		 module_directory='/tmp/mako_modules')
-			print("Content-type:text/html\r\n\r\n",mytemplate.render(session_id=session_id))	
+			print("Content-type:text/html\r\n\r\n",
+				mytemplate.render(session_id=session_id))	
 		
 		else:
 			loginHTML(user)
