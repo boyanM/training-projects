@@ -63,7 +63,8 @@ def renew(session_id):
 def isValidSession(session_id):
 	try:
 		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		timeout = site_db.queryDB('select user_timeout from session;')
+		timeout = site_db.queryDB('select user_timeout from session where id=%s;',
+			session_id)
 
 		if datetime.now() >= timeout[0][0]:
 			return False
@@ -74,6 +75,8 @@ def isValidSession(session_id):
 	except (Exception,psycopg2.Error) as error:
 		return False
 
+	finally:
+		site_db.closeDB()
 
 
 def deleteSession(session_id):

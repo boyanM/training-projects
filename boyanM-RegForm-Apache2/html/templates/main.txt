@@ -16,7 +16,7 @@
 	  </li>
 	  <li><a href="#contact">Contact</a></li>
 	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
-	  <li class="menu_right"><a href="https://test.com/php/logout.php">Cart</a></li>
+	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py?session_id=${session_id | h}">Cart</a></li>
 	</ul>
 	<br>
 <div id="message"></div>

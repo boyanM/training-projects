@@ -2,5 +2,11 @@
 
 from callDB import callDB
 import session
+from datetime import datetime  
 
-print(session.createSession('boyan101'))
+
+if session.isValidSession(44) == True:
+	print("True")
+
+else:
+	print("False")

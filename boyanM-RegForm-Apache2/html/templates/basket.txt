@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="https://test.com/basket.css">
+	<title>Basket</title>
+</head>
+<body>
+<h1>Shopping cart</h1>
+<h2>${session_id | h}</h2>
+<div class="item">
+	<div>
+		<p>Name</p>
+	</div>
+
+	<div>
+		<p>Price</p>
+	</div>
+	
+	<div>
+		<p>Quantity</p>
+	</div>	
+</div>
+
+</body>
+</html>
