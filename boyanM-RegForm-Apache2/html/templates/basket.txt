@@ -1,27 +1,58 @@
+<%def name="myfunc(attributes)">
+	<div class="item">
+		
+		<img src="${attributes[1]}" alt="${attributes[0]} image"
+		 width="50" height="50" class="product_image">
+		
+		<div>
+			<p>Name:	${attributes[0]}</p>
+		</div>
+
+		<div>
+			<label for="Quantity">Quantity</label>
+	   		<input type="number" name="quantity" min="1"
+	   		 value="${attributes[2]}" onkeyup="priceLoader(this.value,${attributes[3]},
+	   		 ${attributes[4]})" required>
+		</div>	
+		
+		<div>
+			<p id="price${attributes[4]}">Price:	${attributes[3]}</p>
+		</div>
+	</div>
+</%def>
+
+
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="https://test.com/basket.css">
+	<script type="text/javascript" src="https://test.com/js/priceLoader.js"></script>
 	<title>Basket</title>
 </head>
 <body>
-<h1>Shopping cart</h1>
-<h2>${session_id | h}</h2>
-<div class="item">
-	<div>
-		<p>Name</p>
-	</div>
 
-	<div>
-		<p>Price</p>
-	</div>
-	
-	<div>
-		<p>Quantity</p>
-	</div>	
-</div>
+	<ul>
+	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}">Home</a></li>
+	  <li>
+	  	<a href="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">Account</a>
+	  </li>
+	  <li><a href="#contact">Contact</a></li>
+	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
+	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py?session_id=${session_id | h}">Cart</a></li>
+	</ul>
+
+	<form name="reg_form" method = "POST" action="https://test.com/cgi-bin/rendering/order.py?session_id=${session_id | h}">
+		% for a in basket_info:
+			${myfunc(a)}
+		% endfor
+		
+		<h2 id="total">Total:${total | h}</h2>
+		<button type="submit" class="registerbtn">
+		Order now !</button>
+	</form>
+
 
 </body>
 </html>

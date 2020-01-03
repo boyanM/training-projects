@@ -23,11 +23,8 @@ try:
 	
 	cursor = connection.cursor()
 
-	cursor.execute("select price from products where id=%s;",(product_id))
-	price = cursor.fetchall()
-
-	cursor.execute("insert into basket (customer_id,product_id,price) values(%s,%s,%s)",
-		(int(customer_id),int(product_id),price[0][0]))
+	cursor.execute("insert into basket (customer_id,product_id) values(%s,%s)",
+		(int(customer_id),int(product_id)))
 
 	connection.commit()
 	print("""<div class="alert success">
@@ -40,13 +37,16 @@ except(Exception,psycopg2.IntegrityError) as err:
  		print("""<div class="alert warning">
   					<span class="closebtn">&times;</span>  
   					<strong>Warning!</strong> Product already in your basket.
-				</div>""") 
+				</div>""")
+		
 
 except(Exception,psycopg2.Error) as error:
 		print("""<div class="alert">
  			 		<span class="closebtn">&times;</span>  
   					<strong>Error!</strong> Error while adding product to basket.
 				</div>""")
+		
+
 
 finally:
 	if connection:

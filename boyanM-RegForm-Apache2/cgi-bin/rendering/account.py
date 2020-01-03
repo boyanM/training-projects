@@ -45,18 +45,23 @@ if session.isValidSession(session_id):
 		change['email'] = customer_email
 	
 	if customer_address != None and address != customer_address:
-		address_id = form.getvalue('address')
-		address_id = address_id[address_id.find('[')+1:address_id.find(']')]
-		address_id = int(address_id)
-		change['address'] = address_id		
+		if customer_country == 'Bulgaria':
+			address_id = form.getvalue('address')
+			address_id = address_id[address_id.find('[')+1:address_id.find(']')]
+			address_id = int(address_id)
+			change['address'] = address_id
+		
+		else:
+			change['address'] = 0
+
 
 	if customer_phone != None and phone != customer_phone:
 		change['phone'] = int(form.getvalue('phone'))
 
 	if customer_country != None and country != customer_country:
-		country_id = db.query('select id from countries where country=%s',
+		country_id = db.queryDB('select id from countries where country=%s',
 			form.getvalue('country'))
-		change['country'] = int(country_id[0][0])	
+		change['country_id'] = int(country_id[0][0])	
 
 	if form.getvalue('psw') != None and form.getvalue('psw') == form.getvalue('psw_repeat'):
 		password = str(form.getvalue('psw'))
