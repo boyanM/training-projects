@@ -1,4 +1,5 @@
 function priceLoader(quantity,price,basket_id){
+  // session_id 
   if (quantity == 0 || quantity === undefined) {
     document.getElementById("price"+basket_id).innerHTML = "Price: ";
     return;

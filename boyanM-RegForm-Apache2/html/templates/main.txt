@@ -40,7 +40,7 @@
 <div class="card">
   <img src="https://service.pcconnection.com/images/inhouse/F397CAF9-908F-4D4E-9CFC-A5BEDE046BF8.jpg?interpolation=lanczos-none&downsize=800%3a*" alt="RJ45 Connector" style="width:100%">
   <h1>RJ45 Connector</h1>
-  <p class="price">$0.002</p>
+  <p class="price">$0.02</p>
   <p>Quality Connectors. Buy now !</p>
   <button onclick="addProduct(${customer_id | h},3)">Add to Cart</button>
 </div>

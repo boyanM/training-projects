@@ -15,6 +15,10 @@ check_session = session.isValidSession(session_id)
 if check_session:
 	session.renew(session_id)
 	db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+
+	mytemplate = Template(filename='/var/www/test.com/html/templates/order.txt',
+		module_directory='/tmp/mako_modules')
+	print("Content-type:text/html\r\n\r\n",mytemplate.render(user=''))
 	
 
 else:

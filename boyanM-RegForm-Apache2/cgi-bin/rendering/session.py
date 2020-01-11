@@ -28,7 +28,7 @@ def createSession(user):
 		session_id = site_db.queryDB("""select id from session
 								 	where customer_id = %s
 								 	 and auto_logout = %s""",user_id,auto_logout)
-
+#assert number lines == 1
 		return session_id[0][0]
 
 	except (Exception,psycopg2.Error) as error:

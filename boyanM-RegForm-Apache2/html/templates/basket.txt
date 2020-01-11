@@ -51,6 +51,9 @@
 		<h2 id="total">Total:${total | h}</h2>
 		<button type="submit" class="registerbtn">
 		Order now !</button>
+		<label for="total">Total:</label>
+	  	<input type="total" name="total" min="1" value="${total | h}"
+	  	 required>		
 	</form>
 
 
