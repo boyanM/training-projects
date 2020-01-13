@@ -5,8 +5,9 @@ import cgi,cgitb
 
 C = cookies.SimpleCookie()
 
-C['session_id'] = 12
-print(C.output(header="Cookie:"))
+C['session_id'] = 15
+C['proba'] = 2
+print(C.output(header="Set-Cookie:"))
 
 print("Content-type:text/html\r\n\r\n")
 
