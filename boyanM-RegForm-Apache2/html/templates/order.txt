@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="https://test.com/order.css">
+		<title>Order</title>
+	</head>
+	<body>
+		<form name="shipping_info" method="POST" action="https://test.com/cgi-bin/rendering/payment.py">
+			
+			<label for="recipient">First and Last Name</label>
+			<input type="text" required>
+
+			<label for="phone_of_recipient">Phone number</label>
+			<input type="text" required>
+
+			<label for="email_of_recipient">E-mail</label>
+			<input type="text" required>
+
+			<label for="Address_of_recipient">Address</label>
+			<input type="text" required>
+
+			<button type="submit" class="registerbtn">Proceed with payment</button>
+
+
+		</form>
+	</body>
+</html>

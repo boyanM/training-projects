@@ -43,14 +43,13 @@
 	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py?session_id=${session_id | h}">Cart</a></li>
 	</ul>
 
-	<form name="quantity_form" method = "POST" action="https://test.com/cgi-bin/rendering/order.py?session_id=${session_id | h}">
+	<form name="quantity_form" method = "POST" action="https://test.com/cgi-bin/rendering/order.py">
 		% for a in basket_info:
 			${myfunc(a)}
 		% endfor
-		
+		<input type="hidden" name="total" value="${total | h}">
 		<h2 id="total">Total:${total | h}</h2>
-		<button type="submit" class="registerbtn">
-		Order now !</button>
+		<button type="submit" class="registerbtn">Order now !</button>
 	</form>
 
 
