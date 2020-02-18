@@ -8,7 +8,7 @@ import datetime
 import subprocess
 from mako.template import Template
 import session
-
+from callDB import callDB
 
 def validate(user,psw):
 	result = False
@@ -142,12 +142,12 @@ else:
 	
 	if result == True and wait != True:
 		
-		session_id = session.createSession(user)
-		if session_id != False:
+		created = session.createSession(user)
+		if created != False:
 			mytemplate = Template(filename='/var/www/test.com/html/templates/login_suc.txt',
 		 module_directory='/tmp/mako_modules')
 			print("Content-type:text/html\r\n\r\n",
-				mytemplate.render(session_id=session_id))	
+				mytemplate.render())	
 		
 		else:
 			loginHTML(user)

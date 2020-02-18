@@ -1,5 +1,5 @@
 <html>
 <head>
-    <meta http-equiv="refresh" content="0;url=https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}"/>
+    <meta http-equiv="refresh" content="0;url=https://test.com/cgi-bin/rendering/main.py"/>
 </head>
 </html>

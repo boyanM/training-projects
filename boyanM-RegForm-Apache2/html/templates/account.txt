@@ -6,12 +6,12 @@
 	</head>
 	<body>
 	<ul>
-	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}">Home</a></li>
+	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py">Home</a></li>
 	  <li>
-	  	<a href="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">Account</a>
+	  	<a href="https://test.com/cgi-bin/rendering/account.py">Account</a>
 	  </li>
 	  <li><a href="#contact">Contact</a></li>
-	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
+	  <li><a href="https://test.com/cgi-bin/logout.py">Logout</a></li>
 	</ul>
 
 
@@ -24,7 +24,7 @@
 	<hr>
 	
 		<form name="edit_acc" method="POST"
-		 action="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">
+		 action="https://test.com/cgi-bin/rendering/account.py">
 			<label>Username</label>
 			<input type="text" class="acc_field" name="username" value='${username | h}' disabled required>
 			

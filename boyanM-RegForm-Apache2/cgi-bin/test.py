@@ -2,12 +2,12 @@
 
 from http import cookies
 import cgi,cgitb
-
-C = cookies.SimpleCookie()
+import requests
 
 C['session_id'] = 61
-C['session_id']['expires']=86400
-C['session_id']['path']='/'
+C['session_id']['expires'] = 86400
+C['session_id']['path'] = '/'
+
 print(C.output(header="Set-Cookie:"))
 
 print("Content-type:text/html\r\n\r\n")

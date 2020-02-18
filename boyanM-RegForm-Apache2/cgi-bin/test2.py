@@ -1,17 +1,13 @@
 #!/usr/bin/python3
 
 from http import cookies
-import os
 import cgi,cgitb
+import logs
 import requests
+import os
 
-C = cookies.SimpleCookie()
+print("Content-type: text/plain\n")
 
-print("Content-type:text/html\r\n\r\n")
 
-cookie_string = os.environ.get('HTTP_COOKIE')
-
-C.load(cookie_string)
-session = int(C['session_id'].value)
-
-print(session)
+C=cookies.SimpleCookie(os.environ["HTTP_COOKIE"])
+print(C['customer_id'].value)

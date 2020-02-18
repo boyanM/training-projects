@@ -10,13 +10,13 @@
 </head>
 <body>
 	<ul>
-	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}">Home</a></li>
+	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py">Home</a></li>
 	  <li>
-	  	<a href="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">Account</a>
+	  	<a href="https://test.com/cgi-bin/rendering/account.py">Account</a>
 	  </li>
 	  <li><a href="#contact">Contact</a></li>
-	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
-	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py?session_id=${session_id | h}">Cart</a></li>
+	  <li><a href="https://test.com/cgi-bin/logout.py">Logout</a></li>
+	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py">Cart</a></li>
 	</ul>
 	<br>
 <div id="message"></div>

@@ -5,18 +5,20 @@
 		 width="50" height="50" class="product_image">
 		
 		<div>
-			<p>Name:	${attributes[0]}</p>
+			<p style="text-align:center">${attributes[0]}</p>
 		</div>
 
 		<div>
-			<label for="Quantity">Quantity</label>
-	   		<input type="number" name="quantity" min="1"
-	   		 value="${attributes[2]}" onkeyup="priceLoader(this.value,${attributes[3]},
-	   		 ${attributes[4]})" required>
+			<div style="text-align:center; margin-top:15px;">
+				<label for="Quantity" style="padding-top: 10px;">Quantity</label>
+		   		<input type="number" name="quantity" min="1"
+		   		 value="${attributes[2]}" onkeyup="priceLoader(this.value,${attributes[3]},
+		   		 ${attributes[4]})" required>
+	   		 </div>
 		</div>	
 		
 		<div>
-			<p id="price${attributes[4]}">Price:	${attributes[3]}</p>
+			<p id="price${attributes[4]}" style=" text-align:right; padding-right:20px;">Price:	${attributes[3]}</p>
 		</div>
 	</div>
 </%def>
@@ -34,13 +36,13 @@
 <body>
 
 	<ul>
-	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py?session_id=${session_id | h}">Home</a></li>
+	  <li><a class="active" href="https://test.com/cgi-bin/rendering/main.py">Home</a></li>
 	  <li>
-	  	<a href="https://test.com/cgi-bin/rendering/account.py?session_id=${session_id | h}">Account</a>
+	  	<a href="https://test.com/cgi-bin/rendering/account.py">Account</a>
 	  </li>
 	  <li><a href="#contact">Contact</a></li>
-	  <li><a href="https://test.com/cgi-bin/logout.py?session_id=${session_id | h}">Logout</a></li>
-	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py?session_id=${session_id | h}">Cart</a></li>
+	  <li><a href="https://test.com/cgi-bin/logout.py">Logout</a></li>
+	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py">Cart</a></li>
 	</ul>
 
 	<form name="quantity_form" method = "POST" action="https://test.com/cgi-bin/rendering/order.py">
@@ -48,10 +50,52 @@
 			${myfunc(a)}
 		% endfor
 		<input type="hidden" name="total" value="${total | h}">
-		<h2 id="total">Total:${total | h}</h2>
-		<button type="submit" class="registerbtn">Order now !</button>
+		<h2 id="total" align="right">Total:${total | h}</h2>
 	</form>
 
+	<div id="paypal-button" align="right"></div>
+	<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+	<script>
+	  paypal.Button.render({
+	    // Configure environment
+	    env: 'sandbox',
+	    client: {
+	      sandbox: 'Af-vJwO7_fpRsCXdbLFqriqBmdJ9rsvF4KrTlvzYYaZjNvWYeyQM-iDlNQjsbsPKYa2ICdX5YqopcYzK',
+	      production: 'demo_production_client_id'
+	    },
+	    // Customize button (optional)
+	    locale: 'en_US',
+	    style: {
+	      size: 'small',
+	      color: 'gold',
+	      shape: 'pill',
+	    },
+
+	    // Enable Pay Now checkout flow (optional)
+	    commit: true,
+
+	    // Set up a payment
+	    payment: function(data, actions) {
+	      return actions.payment.create({
+	        transactions: [{
+	          amount: {
+	            total: '${total | h}',
+	            currency: 'USD'
+	          }
+	        }]
+	      });
+	    },
+	    // Execute the payment
+	    onAuthorize: function(data, actions) {
+	      return actions.payment.execute().then(function() {
+	        // Show a confirmation message to the buyer
+	        window.alert('Thank you for your purchase!');
+	      });
+	    }
+	  }, '#paypal-button');
+
+	</script>
 
 </body>
 </html>
+

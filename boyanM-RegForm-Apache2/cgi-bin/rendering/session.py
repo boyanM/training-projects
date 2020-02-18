@@ -1,92 +1,104 @@
 #!/usr/bin/python3
 
-import psycopg2
+from http import cookies
 import cgi,cgitb
-from datetime import datetime  
-from datetime import timedelta  
+import logs
 from callDB import callDB
+
 
 def createSession(user):
 	try:
-		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		timeout = site_db.queryDB('''select c.id,p.user_timeout,p.auto_logout
-		 from customers c,pass_auth p where username=%s''',user)
-		user_id = int(timeout[0][0])
-		user_timeout = datetime.now() + timedelta(seconds=timeout[0][1])
-		auto_logout = datetime.now() + timedelta(seconds=timeout[0][2])
+		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+		assert db != False
 		
-		user_timeout = user_timeout.strftime("%Y-%m-%d %H:%M:%S")
-		auto_logout = auto_logout.strftime("%Y-%m-%d %H:%M:%S")
-
-
-		check = site_db.executeDB('''insert into
-		 session(customer_id,timestamp,user_timeout,auto_logout)
-		 values(%s,%s,to_timestamp(%s,\'YYYY-MM-DD HH24:MI:SS\'),
-			(select to_timestamp(%s,\'YYYY-MM-DD HH24:MI:SS\')))''',
-			user_id,'now()',user_timeout,auto_logout)
+		C = cookies.SimpleCookie()
 		
-		session_id = site_db.queryDB("""select id from session
-								 	where customer_id = %s
-								 	 and auto_logout = %s""",user_id,auto_logout)
-#assert number lines == 1
-		return session_id[0][0]
+		user_id = db.queryDB('''select id 
+								from customers 
+								where username=%s''',user)
+		
+		assert user_id != False
+		user_id = user_id[0][0]
 
-	except (Exception,psycopg2.Error) as error:
-		print("Error while creating session:",error)
+		session_id = db.addSessionDB('''insert into
+		session(customer_id,created,user_timeout)
+		values(%s,now(),now() + interval '30 minutes') returning id;''',user_id)
+
+		assert session_id != False
+
+		C['session_id'] = session_id
+		C['session_id']['expires'] = 86400
+		C['session_id']['path'] = '/'
+	
+	except:
+		logs.adminLog.error("Error while creating the session")
+		logs.devLog.exception("Error while creating the session")
+		print("There is a huge traffic in the store. Try again later.")
+
+
+	finally:
+		db.closeDB()
+
+def validate(session_id):
+	try:
+ 		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+ 		assert db != False
+
+ 		check = db.queryDB('''select
+ 		 					  (select user_timeout from session
+ 		 					  where id=%s) > now();''',session_id)
+ 		assert check != False
+ 		check = check[0][0]
+
+ 		if check == True:
+ 			return True
+ 		else:
+ 			return False
+	
+	except:
+		logs.adminLog.error("Error while validating the session of %s"%(session_id))
+		logs.devLog.exception("Error while validating the session of %s"%(session_id))
+		print("This page is on huge load. Please try again later.")		
 		return False
 
 	finally:
-		site_db.closeDB()
-	
+		db.closeDB()
 
 def renew(session_id):
 	try:
-		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		timeout = site_db.queryDB('select user_timeout from pass_auth;')
+ 		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+ 		assert db != False		
 
-		user_timeout = datetime.now() + timedelta(seconds=timeout[0][0])
+ 		update = db.executeDB('''update session set
+ 		 user_timeout = now() + interval '30 minutes' where id=%s''',
+ 		 session_id)
 
-		user_timeout = user_timeout.strftime("%Y-%m-%d %H:%M:%S")
+ 		assert update != False
 
-		site_db.executeDB('''update session set user_timeout = %s
-		 where id = %s;''',user_timeout,session_id)
-
-		return session_id
-
-	except (Exception,psycopg2.Error) as error:
-		print("Error while creating session:",error)
+	except:
+		logs.adminLog.error("Error while renewing the session of user with id: %s"%(session_id))
+		logs.devLog.exception("Error while renewing the session of user with id: %s"%(session_id))
+		print("Oops we ran into a problem. Please try again later !")		
 		return False
 
 	finally:
-		site_db.closeDB()
-
-def isValidSession(session_id):
-	try:
-		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		timeout = site_db.queryDB('select user_timeout from session where id=%s;',
-			session_id)
-
-		if datetime.now() >= timeout[0][0]:
-			return False
-
-		else:
-			return True
-
-	except (Exception,psycopg2.Error) as error:
-		return False
-
-	finally:
-		site_db.closeDB()
-
+		db.closeDB()
 
 def deleteSession(session_id):
-	try:
-		site_db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
-		site_db.executeDB("delete from session where id =%s",session_id)
-	
-	except (Exception,psycopg2.Error) as error:
-		print("Error while deleting the session:",error)
+	try:	
+ 		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
+ 		assert db != False
+
+ 		delete = db.executeDB('''delete from session where id=%s''',
+ 		 session_id)
+
+ 		assert delete != False
+
+	except:
+		logs.adminLog.error("Error while deleting the session of user with id: %s"%(session_id))
+		logs.devLog.exception("Error while deleting the session of user with id: %s"%(session_id))
+		print("Sorry we can't log you out now. Please try again in a moment !")
 		return False
-		
+
 	finally:
-		site_db.closeDB()
+		db.closeDB()
