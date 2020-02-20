@@ -39,6 +39,7 @@ $col_name = pg_fetch_assoc($result);
 		  	<a href="https://test.com/pass_conf.php">Password Configuration</a>
 		  </li>
 		  <li><a href="https://test.com/timeout_conf.php">Timeout Configuration</a></li>
+		  <li><a href="https://test.com/cgi-bin/rendering/references.py">All Orders</a></li>
 		</ul>
 
 		

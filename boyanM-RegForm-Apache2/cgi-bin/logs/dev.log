@@ -1,1 +1,14 @@
 
+[20-Feb-20 21:06:48] ERROR In confirm.py on line 62 - name 'executeDB' is not defined
+[20-Feb-20 21:08:35] ERROR In confirm.py on line 62 - name 'executeDB' is not defined
+[20-Feb-20 21:10:23] ERROR In confirm.py on line 62 - name 'executeDB' is not defined
+[20-Feb-20 21:10:46] ERROR In confirm.py on line 62 - name 'executeDB' is not defined
+[20-Feb-20 21:12:45] ERROR In callDB.py on line 60 - Error while executing the query
+Traceback (most recent call last):
+  File "/usr/lib/cgi-bin/rendering/callDB.py", line 55, in queryDB
+    self.cursor.execute(query,params)
+psycopg2.ProgrammingError: column o.quantitiy does not exist
+LINE 1: select i.image_url,p.name,o.price,o.quantitiy
+                                          ^
+HINT:  Perhaps you meant to reference the column "o.quantity".
+

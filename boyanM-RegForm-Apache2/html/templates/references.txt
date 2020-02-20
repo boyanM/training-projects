@@ -1,0 +1,58 @@
+<%def name="myfunc(attributes)">
+	<tr>
+	    <td>
+	    	${attributes[0]}
+		</td>
+
+	    <td>
+	    	${attributes[1]}
+	    </td>
+
+	    <td>
+	    	${attributes[3]}
+	    </td>
+
+	    <td>
+	    	${attributes[2]}
+	    </td>
+
+	</tr>
+
+</%def>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="https://test.com/search.css">
+		<title>Your Orders</title>
+	</head>
+	<body>
+	<ul>
+	 <ul>
+		  <li><a
+		   href="https://test.com/useracc.php" class="active">User Accounts</a></li>
+		  <li>
+		  	<a href="https://test.com/pass_conf.php">Password Configuration</a>
+		  </li>
+		  <li><a href="https://test.com/timeout_conf.php">Timeout Configuration</a></li>
+		  <li><a href="https://test.com/cgi-bin/rendering/references.py">All Orders</a></li>
+		</ul>
+	</ul><br>
+
+
+	<table>
+		<tr>
+			<th>Customer</th>
+			<th>Name</th>
+			<th>Quantity</th>
+			<th>Price</th>
+ 		</tr>
+ 		% for a in order_info:
+			${myfunc(a)}
+		% endfor
+	</table>
+		
+	</body>
+</html>

@@ -6,7 +6,7 @@ from mako.template import Template
 import cgi,cgitb
 import session
 from callDB import callDB
-
+import logs
 #=======================================================================
 
 try:
@@ -20,28 +20,33 @@ try:
 	check_session = session.validate(session_id)
 
 	if check_session:
-		
+
 		assert (session.renew(session_id) != False),"Error while renewing\
 		 session of user with id:%s"%(session_id)
 
 		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
 		assert db != False,"Errow while connecting to the database"
+		
+		basket = db.queryDB("""select """)
 
-		order_info = db.queryDB("""select i.image_url,p.name,o.price,o.quantity
-		 from orders as o,products as p,images as i
-		  where
-		   o.customer_id = %s and 
-		   p.id = o.product_id and
-		   i.id = p.image_id;""",customer_id)
+		confirm = db.executeDB("""insert into
+		 orders(customer_id,price,quantity,product_id)
+		  select b.customer_id,b.quantity*p.price,b.quantity,b.product_id 
+		  from basket as b,products as p
+		   where b.customer_id =%s and  b.product_id=p.id;""",customer_id)
 
-		assert order_info != False,"Error while displaying the ordered\
-		 item to user with id:%s"%(customer_id)
+		assert confirm != False,"Error while confirming order\
+		 of user with id:%s"%(customer_id)
 
-		mytemplate = Template(filename='/var/www/test.com/html/templates/order.txt',
+		delete_basket = db.executeDB("""delete from basket
+		  where customer_id=%s""",customer_id)
+
+		assert delete_basket != False,"Error while deleting already\
+		 purchased items from the basket of user with id:%s"%(customer_id)
+
+		mytemplate = Template(filename='/var/www/test.com/html/templates/succ.txt',
 			module_directory='/tmp/mako_modules')
-		print("Content-type:text/html\r\n\r\n",
-			mytemplate.render(order_info=order_info))
-
+		print("Content-type:text/html\r\n\r\n",mytemplate.render())		
 
 	else:
 		assert (session.deleteSession(session_id) != False),"Error while\

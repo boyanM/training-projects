@@ -10,7 +10,7 @@
 	  <li>
 	  	<a href="https://test.com/cgi-bin/rendering/account.py">Account</a>
 	  </li>
-	  <li><a href="#contact">Contact</a></li>
+	  <li><a href="https://test.com/cgi-bin/rendering/order.py">My Orders</a></li>
 	  <li><a href="https://test.com/cgi-bin/logout.py">Logout</a></li>
 	</ul>
 

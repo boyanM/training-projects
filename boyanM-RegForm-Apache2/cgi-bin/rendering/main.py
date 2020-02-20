@@ -7,8 +7,9 @@ from callDB import callDB
 from http import cookies
 import os
 
-form = cgi.FieldStorage()
 try: 
+	form = cgi.FieldStorage()
+
 	C = cookies.SimpleCookie(os.environ["HTTP_COOKIE"])
 
 	session_id = int(C['session_id'].value)
@@ -24,10 +25,8 @@ try:
 		db = callDB('wordpress','wpuser','password','127.0.0.1','5432')
 		assert db != False,"Errow while connecting to the database"
 
-		customer_id = db.queryDB('select customer_id from session where id=%s;',session_id)
-
 		if customer_id != False:
-			C['customer_id'] = customer_id[0][0]
+			C['customer_id'] = customer_id
 			mytemplate = Template(
 			filename='/var/www/test.com/html/templates/main.txt',
 			module_directory='/tmp/mako_modules'

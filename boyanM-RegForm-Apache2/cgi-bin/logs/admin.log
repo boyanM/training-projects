@@ -1,1 +1,6 @@
 
+[20-Feb-20 21:06:48] ERROR In confirm.py - name 'executeDB' is not defined
+[20-Feb-20 21:08:35] ERROR In confirm.py - name 'executeDB' is not defined
+[20-Feb-20 21:10:23] ERROR In confirm.py - name 'executeDB' is not defined
+[20-Feb-20 21:10:46] ERROR In confirm.py - name 'executeDB' is not defined
+[20-Feb-20 21:12:45] ERROR In callDB.py - Error while executing the query

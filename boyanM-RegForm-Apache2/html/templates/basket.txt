@@ -40,7 +40,7 @@
 	  <li>
 	  	<a href="https://test.com/cgi-bin/rendering/account.py">Account</a>
 	  </li>
-	  <li><a href="#contact">Contact</a></li>
+	  <li><a href="https://test.com/cgi-bin/rendering/order.py">My Orders</a></li>
 	  <li><a href="https://test.com/cgi-bin/logout.py">Logout</a></li>
 	  <li class="menu_right"><a href="https://test.com/cgi-bin/rendering/basket.py">Cart</a></li>
 	</ul>
@@ -49,11 +49,11 @@
 		% for a in basket_info:
 			${myfunc(a)}
 		% endfor
-		<input type="hidden" name="total" value="${total | h}">
-		<h2 id="total" align="right">Total:${total | h}</h2>
+		<input type="hidden" id="total_h" name="total" value="${total | h}">
+		<h2 id="total" style="text-align:right; margin-right:230px;">Total:${total | h}</h2>
 	</form>
 
-	<div id="paypal-button" align="right"></div>
+	<div id="paypal-button" style="text-align:right; margin-right:230px;"></div>
 	<script src="https://www.paypalobjects.com/api/checkout.js"></script>
 	<script>
 	  paypal.Button.render({
@@ -75,24 +75,39 @@
 	    commit: true,
 
 	    // Set up a payment
-	    payment: function(data, actions) {
-	      return actions.payment.create({
-	        transactions: [{
-	          amount: {
-	            total: '${total | h}',
-	            currency: 'USD'
-	          }
-	        }]
-	      });
-	    },
-	    // Execute the payment
-	    onAuthorize: function(data, actions) {
-	      return actions.payment.execute().then(function() {
-	        // Show a confirmation message to the buyer
-	        window.alert('Thank you for your purchase!');
-	      });
-	    }
-	  }, '#paypal-button');
+  payment: function(data, actions) {
+    // Make a call to the REST API to set up the payment
+    return actions.payment.create({
+      payment: {
+        transactions: [
+          {
+            amount: { total: document.getElementById("total_h").value, currency: 'USD' }        
+          }
+        ],
+        redirect_urls: {
+          return_url: 'https://test.com/cgi-bin/rendering/confirm.py',
+          cancel_url: 'https://test.com/cgi-bin/rendering/main.py'
+        }
+      }
+    });
+  },
+
+  // onAuthorize() is called when the buyer approves the payment
+  onAuthorize: function(data, actions) {
+
+    // Make a call to the REST API to execute the payment
+    return actions.payment.execute().then(function() {
+      actions.redirect();
+      }
+    );
+  },
+
+  onCancel: function(data, actions) {
+    actions.redirect();
+    }
+
+}, '#paypal-button');
+
 
 	</script>
 

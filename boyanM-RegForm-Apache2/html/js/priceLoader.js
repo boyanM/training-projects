@@ -13,6 +13,9 @@ function priceLoader(quantity,price,basket_id){
         
         document.getElementById("total").innerHTML =
          this.responseText.slice(price_index+1)
+
+        document.getElementById("total_h").value =
+         this.responseText.slice(price_index+8,-1)  
       }
     };
     xmlhttp.open("GET",
